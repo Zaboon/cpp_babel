@@ -1,14 +1,21 @@
-#pragma once
 
+#ifndef PROJECT2_ITHREAD_HPP
+#define PROJECT2_ITHREAD_HPP
+
+#include <unistd.h>
 #include <iostream>
 #include <string>
 #include <vector>
+
+#include "IMutex.hpp"
+#include "MutexVault.hpp"
 
 template<typename T, typename U>
 class IThread
 {
 public:
 
+	//status define
 	enum Status
 	{
 		Ready,
@@ -17,19 +24,53 @@ public:
 		Stopped
 	};
 
-	IThread(T (*func_ptr)(U))
+	static void *(entry_point)(void *_this)
 	{
+		IThread *self = static_cast<IThread<T, U> *>(_this);
+
+		self->setStatus(Running);
+		self->_func_ptr(self->getId(), self->getParameter());
+		self->setStatus(Stopped);
+		MutexVault::getMutexVault()->remove(self->getId());
+		return (NULL);
+	}
+
+	//id and status
+	unsigned int _id;
+	Status _status;
+
+	//mutex vault
+	MutexVault *_mutex_vault;
+
+	//target function attributes
+	T (*_func_ptr)(unsigned int, U);
+	U _param;
+
+public:
+
+	IThread(T (*func_ptr)(unsigned int, U))
+	{
+		static unsigned int id = 0;
+
+		this->_id = id++;
 		this->_func_ptr = func_ptr;
 		this->_status = Ready;
+		this->_mutex_vault = MutexVault::getMutexVault();
 	}
 
 	virtual ~IThread()
 	{
+		this->_mutex_vault->remove(this->_id);
 	}
 
 	Status getStatus() const
 	{
 		return (this->_status);
+	}
+
+	unsigned int getId() const
+	{
+		return (this->_id);
 	}
 
 	void setStatus(Status status)
@@ -42,25 +83,37 @@ public:
 		return (this->_param);
 	}
 
-	virtual void operator()(U param) = 0;
+	virtual bool operator()(U param) = 0;
 
-protected:
-
-	static void *(entry_point)(void *_this)
+	bool lock(unsigned int thread_id)
 	{
-		IThread *self = dynamic_cast<IThread<T, U> *>(_this);
+		IMutex *mutex;
 
-		self->setStatus(Running);
-		self->_func_ptr(self->getParameter());
-		self->setStatus(Stopped);
-		return (NULL);
+		if ((mutex = (*this->_mutex_vault)[thread_id]) == NULL)
+			return (false);
+		if (this->getStatus() == Running)
+		{
+			this->setStatus(Paused);
+			return (mutex->lock());
+		}
+		return (true);
 	}
 
-	T (*_func_ptr)(U);
+	bool unlock(unsigned int thread_id)
+	{
+		IMutex *mutex;
 
-	U _param;
-
-	Status _status;
+		if ((mutex = (*this->_mutex_vault)[thread_id]) == NULL)
+			return (false);
+		if (this->getStatus() == Paused)
+		{
+			this->setStatus(Running);
+	 		return (mutex->unlock());
+		}
+		return (true);
+	}
 	
 };
+
+#endif
 

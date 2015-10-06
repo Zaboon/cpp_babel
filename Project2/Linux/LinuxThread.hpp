@@ -8,26 +8,33 @@
 #include <pthread.h>
 #include <exception>
 #include "../IThread.hpp"
+#include "LinuxMutex.hpp"
 
 template<typename T, typename U>
 class LinuxThread : public IThread<T,U>
 {
+
+protected:
+
+    pthread_t _thread;
+
 public:
 
-    LinuxThread(T (*func_ptr)(U)) : IThread(func_ptr)
+    LinuxThread(T (*func_ptr)(unsigned int, U)) : IThread<T, U>(func_ptr)
     {
+        IThread<T, U>::_mutex_vault->push_back(new LinuxMutex());
     }
 
-    virtual ~LinuxThread() {};
+    virtual ~LinuxThread()
+    {
+    };
 
     //overloaded
-    virtual void operator()(U param)
+    virtual bool operator()(U param)
     {
         this->_param = param;
 
-        if (pthread_create(&this->_thread, NULL, IThread::entry_point, static_cast<void *>(this)) != 0)
-            throw new std::exception("Failed to create a new thread!");
-        return;
+        return (pthread_create(&this->_thread, NULL, IThread<T, U>::entry_point, static_cast<void *>(this)) == 0);
     }
 
     virtual bool stop()
@@ -39,10 +46,6 @@ public:
         this->setStatus(IThread<T, U>::Stopped);
         return (pthread_cancel(this->_thread) == 0);
     }
-
-protected:
-
-    pthread_t _thread;
 
 };
 
