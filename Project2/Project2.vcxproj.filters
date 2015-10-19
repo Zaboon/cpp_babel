@@ -18,8 +18,19 @@
     <ClInclude Include="ISocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IThread.h">
+    <ClInclude Include="MutexVault.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IMutex.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Socket.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
