@@ -6,51 +6,39 @@
 #define PROJECT2_MUTEXVAULT_HPP
 
 #include <vector>
+#include <map>
+#include <string>
 #include "IMutex.hpp"
 
 class MutexVault
 {
 public:
 
-    static MutexVault *getMutexVault()
-    {
-        static MutexVault *instance = NULL;
+    static const unsigned long int bad_ptr;
 
-        if (instance == NULL)
-            instance = new MutexVault();
-        return (instance);
-    }
+    virtual ~MutexVault();
 
-    virtual ~MutexVault() {};
+    template <typename T>
+    static std::string SomethingToString(T something);
 
-    virtual IMutex *&operator[](unsigned int index)
-    {
-        static IMutex *useless = NULL;
+    static MutexVault *getMutexVault();
 
-        if (index >= this->_mutex_vault.size())
-            return (useless);
-        return (this->_mutex_vault[index]);
-    }
+    static bool isBadPtr(void *ptr);
 
-    virtual void push_back(IMutex *new_element)
-    {
-        this->_mutex_vault.push_back(new_element);
-    }
+    IMutex *&operator[](unsigned int index);
 
-    virtual void remove(unsigned int index)
-    {
-        if (index < this->_mutex_vault.size() && this->_mutex_vault[index] != NULL)
-        {
-            delete this->_mutex_vault[index];
-            this->_mutex_vault[index] = NULL;
-        }
-    }
+    IMutex *&operator[](const std::string &index);
+
+    void push_back(IMutex *new_element);
+
+    void remove(unsigned int index);
 
 protected:
 
-    MutexVault() {};
+    MutexVault();
 
     std::vector<IMutex *> _mutex_vault;
+    std::map<std::string, IMutex *> _mutex_vault_map;
 };
 
 #endif //PROJECT2_MUTEXVAULT_HPP

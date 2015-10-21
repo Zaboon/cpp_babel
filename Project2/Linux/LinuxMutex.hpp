@@ -9,6 +9,11 @@ class LinuxMutex : public IMutex
 {
 public:
 
+    LinuxMutex()
+    {
+        this->_mutex = PTHREAD_MUTEX_INITIALIZER;
+    }
+
     virtual bool lock(bool wait = true)
     {
         if (this->getStatus() == IMutex::Unlocked || wait)
@@ -16,6 +21,7 @@ public:
             pthread_mutex_lock(&this->_mutex);
             return (true);
         }
+        return (false);
     };
 
     virtual bool unlock()

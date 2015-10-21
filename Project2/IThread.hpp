@@ -85,33 +85,27 @@ public:
 
 	virtual bool operator()(U param) = 0;
 
-	bool lock(unsigned int thread_id)
+	bool lock(bool wait)
 	{
 		IMutex *mutex;
 
-		if ((mutex = (*this->_mutex_vault)[thread_id]) == NULL)
+		if ((mutex = (*this->_mutex_vault)[this->_id]) == NULL)
 			return (false);
-		if (this->getStatus() == Running)
-		{
-			this->setStatus(Paused);
-			return (mutex->lock());
-		}
-		return (true);
+		this->setStatus(Paused);
+		return (mutex->lock(wait));
 	}
 
-	bool unlock(unsigned int thread_id)
+	bool unlock()
 	{
 		IMutex *mutex;
 
-		if ((mutex = (*this->_mutex_vault)[thread_id]) == NULL)
+		if ((mutex = (*this->_mutex_vault)[this->_id]) == NULL)
 			return (false);
-		if (this->getStatus() == Paused)
-		{
-			this->setStatus(Running);
-	 		return (mutex->unlock());
-		}
-		return (true);
+		this->setStatus(Running);
+		return (mutex->unlock());
 	}
+
+	virtual bool stop() = 0;
 	
 };
 

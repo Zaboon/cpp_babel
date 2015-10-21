@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "../IThread.hpp"
 #include "LinuxThread.hpp"
+#include "../Packet.h"
 
 int test(unsigned int thread_id, std::string string)
 {
