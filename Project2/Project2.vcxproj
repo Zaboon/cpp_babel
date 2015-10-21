@@ -118,8 +118,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BBException.hpp" />
+    <ClInclude Include="IMutex.hpp" />
     <ClInclude Include="ISocket.h" />
-    <ClInclude Include="IThread.h" />
+    <ClInclude Include="MutexVault.hpp" />
+    <ClInclude Include="Socket.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="BBException.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
