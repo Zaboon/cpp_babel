@@ -3,9 +3,10 @@
 //
 
 #include "LinuxSocket.h"
+#include <stdio.h>
 
 const std::string &
-LinuxSocket::getMachineIp() const
+LinuxSocket::getMachineIp()
 {
     static std::string ip = "";
 
@@ -38,7 +39,7 @@ LinuxSocket::acceptNewClients(unsigned int thread_id, LinuxSocket *server)
     while (42)
     {
         newclient = new LinuxSocket(LinuxSocket::Client);
-        if ((newclient->_socket = accept(server->_socket, reinterpret_cast<const struct sockaddr *>(&s_in), &clinen)) != 0) {
+        if ((newclient->_socket = accept(server->_socket, reinterpret_cast<struct sockaddr *>(&s_in), &clinen)) < 0) {
 
             server->_status = ISocket::Canceled;
             return;
@@ -56,6 +57,7 @@ void
 LinuxSocket::launchClient(unsigned int thread_id, LinuxSocket *client)
 {
     struct pollfd ufd[2];
+    unsigned char buffer[READ_HEAP];
     int rv;
     ssize_t send_val;
     ssize_t read_val;
@@ -65,6 +67,10 @@ LinuxSocket::launchClient(unsigned int thread_id, LinuxSocket *client)
     ufd[0].fd = (ufd[1].fd = client->_socket);
     ufd[0].events = POLLIN;
     ufd[1].events = POLLOUT;
+
+    //if onConnect is attached
+    if (client->getOnConnect() != NULL)
+        client->getOnConnect()(client);
 
     while (42)
     {
@@ -76,14 +82,20 @@ LinuxSocket::launchClient(unsigned int thread_id, LinuxSocket *client)
         if (rv > 0)
         {
             //begin protected action
-            (*vault)["readThread" + MutexVault::SomethingToString<unsigned int>(thread_id)]->lock(true);
+            (*vault)["read" + MutexVault::somethingToString<unsigned int>(client->getId())]->lock(true);
+
             if (client->_read_buffer.size() > MAX_BUFFER_SIZE)
                 client->_read_buffer.clear();
-            client->_read_buffer.reserve(client->_read_buffer.size() + READ_HEAP);
-            if ((read_val = recv(client->_socket, &client->_read_buffer[client->_read_buffer.size()], READ_HEAP, 0)) == -1)
+            if ((read_val = recv(client->_socket, &buffer[0], READ_HEAP, 0)) == -1)
                 throw "Recv failed";
-            client->_read_buffer.reserve(client->_read_buffer.size() + read_val);
-            (*vault)["readThread" + MutexVault::SomethingToString<unsigned int>(thread_id)]->unlock();
+            for (unsigned int i = 0; i < read_val; i++)
+                client->_read_buffer.push_back(buffer[i]);
+            std::cout << "read " << read_val << std::endl;
+            //while protected -> summon onReceive
+            if (client->getOnReceive() != NULL)
+                client->getOnReceive()(client);
+
+            (*vault)["read" + MutexVault::somethingToString<unsigned int>(client->getId())]->unlock();
             //end protected action
         }
         else if (!client->_write_buffer.empty())
@@ -96,12 +108,12 @@ LinuxSocket::launchClient(unsigned int thread_id, LinuxSocket *client)
             if (rv != 0)
             {
                 //begin protected action
-                (*vault)["writeThread" + MutexVault::SomethingToString<unsigned int>(thread_id)]->lock(true);
+                (*vault)["write" + MutexVault::somethingToString<unsigned int>(client->getId())]->lock(true);
                 if ((send_val = send(client->_socket, &(client->_write_buffer[0]), client->_write_buffer.size(), 0)) == -1)
                     throw "Send failed";
                 //delete sent data
                 client->_write_buffer.erase(client->_write_buffer.begin(), client->_write_buffer.begin() + send_val);
-                (*vault)["writeThread" + MutexVault::SomethingToString<unsigned int>(thread_id)]->unlock();
+                (*vault)["write" + MutexVault::somethingToString<unsigned int>(client->getId())]->unlock();
                 //end protected action
             }
             //no event
@@ -115,7 +127,7 @@ LinuxSocket::LinuxSocket(LinuxSocket::Type type) : ISocket(type)
 }
 
 //Server
-LinuxSocket::LinuxSocket(int port = 42, const std::string &proto) : ISocket(ISocket::Server, LinuxSocket::getMachineIp(), port)
+LinuxSocket::LinuxSocket(int port, const std::string &proto) : ISocket(ISocket::Server, LinuxSocket::getMachineIp(), port)
 {
     struct protoent       *pe;
     struct sockaddr_in    s_in;
@@ -129,20 +141,26 @@ LinuxSocket::LinuxSocket(int port = 42, const std::string &proto) : ISocket(ISoc
         throw "socket failed";
     this->_status = ISocket::Ready;
     s_in.sin_family = AF_INET;
-    s_in.sin_port = htons(reinterpret_cast<uint16_t>(port));
+    s_in.sin_port = htons(static_cast<uint16_t>(port));
     s_in.sin_addr.s_addr = INADDR_ANY;
-    if (bind(this->_socket, reinterpret_cast<const struct sockaddr *>(&s_in), sizeof(s_in)) == -1)
+    if (bind(this->_socket, reinterpret_cast<struct sockaddr *>(&s_in), sizeof(s_in)) == -1)
         throw "bind failed";
     if (listen(this->_socket, MAX_CLIENTS) == -1)
         throw "listen failed";
+}
 
+void
+LinuxSocket::startServer()
+{
+    if (this->_type != ISocket::Server || this->_status != ISocket::Ready)
+        return;
     //launch the thread to accept new connections
     this->_thread = new LinuxThread<void, LinuxSocket *>(LinuxSocket::acceptNewClients);
     (*this->_thread)(this);
 }
 
 //Client
-LinuxSocket::LinuxSocket(const std::string &ip, int port = 42, const std::string &proto = "TCP") : ISocket(ISocket::Client, ip, port)
+LinuxSocket::LinuxSocket(const std::string &ip, int port, const std::string &proto) : ISocket(ISocket::Client, ip, port)
 {
 
 }

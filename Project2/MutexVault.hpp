@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <sstream>
 #include "IMutex.hpp"
 
 class MutexVault
@@ -19,15 +20,21 @@ public:
     virtual ~MutexVault();
 
     template <typename T>
-    static std::string SomethingToString(T something);
+    static std::string somethingToString(T something)
+    {
+        std::ostringstream ss;
+
+        ss << something;
+        return ss.str();
+    }
 
     static MutexVault *getMutexVault();
 
     static bool isBadPtr(void *ptr);
 
-    IMutex *&operator[](unsigned int index);
+    IMutex *operator[](unsigned int index);
 
-    IMutex *&operator[](const std::string &index);
+    IMutex *operator[](const std::string &index);
 
     void push_back(IMutex *new_element);
 
