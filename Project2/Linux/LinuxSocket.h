@@ -24,6 +24,7 @@ class LinuxSocket : public ISocket
 private:
 
     int                                 _socket;
+    bool                                _socketOpened;
     LinuxThread<void, LinuxSocket *>    *_thread;
 
 protected:
@@ -35,17 +36,19 @@ protected:
 
     static void launchClient(unsigned int thread_id, LinuxSocket *client);
 
+    //dummy
+    LinuxSocket(ISocket::Type type);
+
 public:
 
     //Server
-    LinuxSocket(int port = 42, const std::string &proto = "TCP");
-
-    //dummy
-    LinuxSocket(Type type);
+    LinuxSocket(int port = 4242, const std::string &proto = "TCP");
 
     static const std::string &getMachineIp();
 
     virtual void startServer();
+
+    void cancel();
 };
 
 

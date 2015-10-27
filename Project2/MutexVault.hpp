@@ -20,7 +20,7 @@ public:
     virtual ~MutexVault();
 
     template <typename T>
-    static std::string somethingToString(T something)
+    static std::string toString(T something)
     {
         std::ostringstream ss;
 
