@@ -36,8 +36,6 @@ MutexVault::operator[](unsigned int index)
 IMutex *
 MutexVault::operator[](const std::string &index)
 {
-    static IMutex *useless = reinterpret_cast<IMutex *>(MutexVault::bad_ptr);
-
     if (this->_mutex_vault_map[index] == NULL)
         this->_mutex_vault_map[index] = new LinuxMutex();
     return (this->_mutex_vault_map[index]);

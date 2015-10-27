@@ -38,7 +38,7 @@ public:
 	//static
 	static ISocket *getServer(int port = 4242, const std::string &proto = "TCP", bool _new = false);
 
-	virtual void startServer() = 0;
+	virtual int start() = 0;
 
 	virtual void cancel() = 0;
 

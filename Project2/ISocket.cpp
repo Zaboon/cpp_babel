@@ -2,7 +2,7 @@
 #include "Linux/LinuxSocket.h"
 
 //dummy
-ISocket::ISocket(Type type)
+ISocket::ISocket(Type type) : _type(type)
 {
     this->_onConnect = NULL;
     this->_onReceive = NULL;
@@ -19,7 +19,7 @@ ISocket::ISocket(Type type, const std::string &ip, int port) : _type(type), _ip(
 ISocket *
 ISocket::getClient(const std::string &ip, int port, const std::string &proto)
 {
-    return NULL;
+    return (new LinuxSocket(ip, port, proto));
 };
 
 ISocket *
@@ -27,8 +27,14 @@ ISocket::getServer(int port, const std::string &proto, bool _new)
 {
     static ISocket *instance = NULL;
 
-    if (_new || !instance)
+    if (_new || !instance) {
+
+    #ifdef _WIN_32
+        instance = new WindowsSocket(port, proto);
+    #else
         instance = new LinuxSocket(port, proto);
+    #endif
+    }
     return (instance);
 };
 

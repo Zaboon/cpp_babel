@@ -29,9 +29,6 @@ private:
 
 protected:
 
-    //Client
-    LinuxSocket(const std::string &ip, int port = 42, const std::string &proto = "TCP");
-
     static void acceptNewClients(unsigned int thread_id, LinuxSocket *server);
 
     static void launchClient(unsigned int thread_id, LinuxSocket *client);
@@ -41,12 +38,15 @@ protected:
 
 public:
 
+    //Client
+    LinuxSocket(const std::string &ip, int port = 42, const std::string &proto = "TCP");
+
     //Server
     LinuxSocket(int port = 4242, const std::string &proto = "TCP");
 
     static const std::string &getMachineIp();
 
-    virtual void startServer();
+    virtual int start();
 
     void cancel();
 };

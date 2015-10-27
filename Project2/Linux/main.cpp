@@ -3,17 +3,16 @@
 //
 
 #include <iostream>
-#include <string>
 #include <unistd.h>
 #include <sstream>
 #include "../IThread.hpp"
-#include "LinuxThread.hpp"
 #include "../Packet.h"
+#include "../ISocket.h"
 #include "LinuxSocket.h"
 
 void testOnDisconnect(ISocket *client)
 {
-    std::cout << client->getIp() << "| client no : " << client->getId() << " disconnected!" << std::endl;
+    std::cout <<  "Client no : " << client->getId() << " from " << client->getIp() << " disconnected!" << std::endl;
 }
 
 void testOnReceive(ISocket *client)
@@ -29,7 +28,7 @@ void testOnReceive(ISocket *client)
 
 void testOnConnect(ISocket *client)
 {
-    std::cout << client->getIp() << "| client no : " << client->getId() << " connected!" << std::endl;
+    std::cout <<  "Client no : " << client->getId() << " from " << client->getIp() << " connected!" << std::endl;
 }
 
 int main(int ac, char **av)
@@ -40,23 +39,23 @@ int main(int ac, char **av)
         return (-1);
     std::istringstream(av[1]) >> port;
     try {
-        LinuxSocket *server = new LinuxSocket(port);
+        ISocket *server = ISocket::getServer(port);
         std::vector<unsigned char> packet;
 
         server->attachOnConnect(testOnConnect);
         server->attachOnReceive(testOnReceive);
         server->attachOnDisconnect(testOnDisconnect);
 
-        server->startServer();
+        server->start();
         std::cout << "Server up and ready on " << server->getIp() << " port " << server->getPort() << " status " << server->getStatus() << std::endl;
 
         std::string s;
         while (s != "quit") {
             std::getline(std::cin, s);
             packet.clear();
-            for (unsigned int i = 0; i < s.size(); i++) {
+            for (unsigned int i = 0; i < s.size(); i++)
                 packet.push_back(static_cast<unsigned char>(s[i]));
-            }
+            packet.push_back(static_cast<unsigned char>('\n'));
             server->write(packet, 0);
         }
         server->cancel();

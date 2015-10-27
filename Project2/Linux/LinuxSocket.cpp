@@ -3,7 +3,6 @@
 //
 
 #include "LinuxSocket.h"
-#include <stdio.h>
 
 const std::string &
 LinuxSocket::getMachineIp()
@@ -52,33 +51,32 @@ LinuxSocket::cancel()
 }
 
 void
-LinuxSocket::acceptNewClients(unsigned int thread_id, LinuxSocket *server)
+LinuxSocket::acceptNewClients(unsigned int __attribute__((__unused__)) thread_id, LinuxSocket *server)
 {
     struct sockaddr_in    s_in;
     socklen_t clinen = sizeof(s_in);
     LinuxSocket *newclient;
 
     server->_status = ISocket::Running;
-    while (42)
+    while (server->_status == ISocket::Running)
     {
-        newclient = new LinuxSocket(LinuxSocket::Client);
-        if ((newclient->_socket = accept(server->_socket, reinterpret_cast<struct sockaddr *>(&s_in), &clinen)) < 0) {
-
+        newclient = new LinuxSocket(ISocket::Client);
+        if ((newclient->_socket = accept(server->_socket, reinterpret_cast<struct sockaddr *>(&s_in), &clinen)) < 0)
             server->_status = ISocket::Canceled;
-            return;
+        else {
+            newclient->_socketOpened = true;
+            newclient->_status = ISocket::Ready;
+            newclient->_port = s_in.sin_port;
+            newclient->_ip = inet_ntoa(s_in.sin_addr);
+            server->addNewClient(newclient);
+            newclient->_thread = new LinuxThread<void, LinuxSocket *>(LinuxSocket::launchClient);
+            (*newclient->_thread)(newclient);
         }
-        newclient->_socketOpened = true;
-        newclient->_status = ISocket::Ready;
-        newclient->_port = s_in.sin_port;
-        newclient->_ip = inet_ntoa(s_in.sin_addr);
-        server->addNewClient(newclient);
-        newclient->_thread = new LinuxThread<void, LinuxSocket *>(LinuxSocket::launchClient);
-        (*newclient->_thread)(newclient);
     }
 }
 
 void
-LinuxSocket::launchClient(unsigned int thread_id, LinuxSocket *client)
+LinuxSocket::launchClient(unsigned int __attribute__((__unused__)) thread_id, LinuxSocket *client)
 {
     struct pollfd ufd[2];
     unsigned char buffer[READ_HEAP];
@@ -177,18 +175,45 @@ LinuxSocket::LinuxSocket(int port, const std::string &proto) : ISocket(ISocket::
     this->_socketOpened = true;
 }
 
-void
-LinuxSocket::startServer()
+int
+LinuxSocket::start()
 {
-    if (this->_type != ISocket::Server || this->_status != ISocket::Ready)
-        return;
-    //launch the thread to accept new connections
-    this->_thread = new LinuxThread<void, LinuxSocket *>(LinuxSocket::acceptNewClients);
-    (*this->_thread)(this);
+    if (this->_status != ISocket::Ready)
+        return (0);
+    if (this->_type == ISocket::Server) {
+        //launch the thread to accept new connections
+        this->_thread = new LinuxThread<void, LinuxSocket *>(LinuxSocket::acceptNewClients);
+        (*this->_thread)(this);
+    }
+    else
+    {
+        struct sockaddr_in    s_in;
+
+        s_in.sin_family = AF_INET;
+        s_in.sin_port = htons(static_cast<uint16_t>(this->_port));
+        if ((s_in.sin_addr.s_addr = inet_addr(this->_ip.c_str())) == INADDR_NONE ||
+            (connect(this->_socket, reinterpret_cast<struct sockaddr *>(&s_in), sizeof(s_in))) == -1) {
+
+            this->cancel();
+            return (-1);
+        }
+        this->_thread = new LinuxThread<void, LinuxSocket *>(LinuxSocket::launchClient);
+        (*this->_thread)(this);
+    }
+    return (1);
 }
 
 //Client
 LinuxSocket::LinuxSocket(const std::string &ip, int port, const std::string &proto) : ISocket(ISocket::Client, ip, port)
 {
-    this->_socketOpened = false;
+    struct protoent       *pe;
+
+    if ((pe = getprotobyname(proto.c_str())) == NULL)
+        throw "getprotobyname failed";
+    if ((this->_socket = socket(AF_INET, SOCK_STREAM, pe->p_proto)) == -1)
+        throw "socket failed";
+    this->_port = port;
+    this->_ip = ip;
+    this->_socketOpened = true;
+    this->_status = ISocket::Ready;
 }
