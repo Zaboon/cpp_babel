@@ -2,7 +2,6 @@
 #ifndef PROJECT2_ITHREAD_HPP
 #define PROJECT2_ITHREAD_HPP
 
-#include <unistd.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -109,5 +108,4 @@ public:
 	
 };
 
-#endif
-
+#endif /* !PROJECT2_ITHREAD_HPP */
