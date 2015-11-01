@@ -25,7 +25,7 @@ public:
 	virtual bool		operator()(U param)
 	{
 		this->_param = param;
-		this->_thread_h = CreateThread(0, 0, IThread<T, U>::entry_point, static_cast<LPVOID>(this), 0, &this->_thread_id);
+		this->_thread_h = CreateThread(0, 0, (LPTHREAD_START_ROUTINE) IThread<T, U>::entry_point, static_cast<LPVOID>(this), 0, &this->_thread_id);
 		return (this->_thread_h != NULL);
 	}
 
