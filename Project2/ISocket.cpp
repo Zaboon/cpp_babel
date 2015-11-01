@@ -1,5 +1,6 @@
 #include "ISocket.h"
 #include "Linux/LinuxSocket.h"
+#include "Windows/WinSocket.h"
 
 //dummy
 ISocket::ISocket(Type type) : _type(type)
@@ -19,7 +20,11 @@ ISocket::ISocket(Type type, const std::string &ip, int port) : _type(type), _ip(
 ISocket *
 ISocket::getClient(const std::string &ip, int port, const std::string &proto)
 {
-    return (new LinuxSocket(ip, port, proto));
+    #ifdef _WIN_32
+        return (new WinSocket(ip, port, proto));
+    #else
+        return (new LinuxSocket(ip, port, proto));
+    #endif
 };
 
 ISocket *
@@ -30,7 +35,7 @@ ISocket::getServer(int port, const std::string &proto, bool _new)
     if (_new || !instance) {
 
     #ifdef _WIN_32
-        instance = new WindowsSocket(port, proto);
+        instance = new WinSocket(port, proto);
     #else
         instance = new LinuxSocket(port, proto);
     #endif

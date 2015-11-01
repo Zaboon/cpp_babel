@@ -6,6 +6,7 @@
 #define PROJECT2_LINUXTHREAD_H
 
 #include <pthread.h>
+#include <unistd.h>
 #include <exception>
 #include "../IThread.hpp"
 #include "LinuxMutex.hpp"
