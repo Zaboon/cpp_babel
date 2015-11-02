@@ -131,6 +131,8 @@
     <ClInclude Include="WinSocket.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ISocket.cpp" />
+    <ClCompile Include="MutexVault.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="BBException.cpp" />
   </ItemGroup>

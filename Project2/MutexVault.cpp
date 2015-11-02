@@ -1,7 +1,12 @@
 #include <sstream>
 #include "MutexVault.hpp"
 #include "IMutex.hpp"
-#include "Linux/LinuxMutex.hpp"
+
+#ifdef WIN32
+# include "Windows/WinCriticalSession.hpp"
+#else
+# include "Linux/LinuxMutex.hpp"
+#endif
 
 const unsigned long int MutexVault::bad_ptr = 0x00000004;
 

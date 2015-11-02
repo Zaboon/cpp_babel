@@ -1,8 +1,21 @@
-#include <iostream>
-#include <string>
+#include		<iostream>
+#include		<string>
+#include		"Windows/WinThread.hpp"
 
-int main() {
+void			superFunction()
+{
+	int			i = 42;
 
+	while (--i > 0)
+	{
+		std::cout << "salut" << std::endl;
+	}
+}
+
+int				main()
+{
 	std::cout << "Nicolas est le plus beau" << std::endl;
-	return 0;
+	
+	getchar();
+	return (0);
 }
