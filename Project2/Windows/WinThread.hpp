@@ -18,7 +18,7 @@ private:
 public:
 	WinThread(T(*func_ptr)(unsigned int, U)) : IThread<T, U>(func_ptr)
 	{
-		IThread<T, U>::_mutex_vault->push_back(new WinMutex());
+		IThread<T, U>::_mutex_vault->push_back(new WinCriticalSession());
 	}
 	virtual ~WinThread() {};
 
@@ -36,7 +36,7 @@ public:
 			return (false);
 
 		this->setStatus(IThread < IThread<T, U> U::Stopped);
-		// I'm sorry Dave, I'm afraid I can't do that (on windows)
+		// I'm sorry Dave, I'm afraid I can't do that (terminating threads on windows)
 		return (1);
 	}
 };
