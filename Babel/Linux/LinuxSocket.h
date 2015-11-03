@@ -11,6 +11,7 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/poll.h>
+#include <stdio.h>
 #include "LinuxThread.hpp"
 #include "../ISocket.h"
 

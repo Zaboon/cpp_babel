@@ -7,6 +7,7 @@
 #include <sstream>
 #include "../IThread.hpp"
 #include "../Packet.h"
+#include "../Rsa.h"
 #include "../ISocket.h"
 #include "LinuxSocket.h"
 
@@ -34,6 +35,22 @@ void testOnConnect(ISocket *client)
 int main(int ac, char **av)
 {
     int port;
+
+    std::string s = "Coucou this is a test";
+    Rsa *r = new Rsa();
+    Packet *p = new Packet(s);
+
+    std::vector<unsigned char> *data = p->build(r);
+    //envoi
+    //reception
+    Packet *a;
+    if ((a = Packet::fromStream(*data, r)) == NULL) {
+
+        std::cout << "failed";
+        return (0);
+    }
+    std::cout << *(a->unpack<std::string>()) << std::endl;
+    return (0);
 
     if (ac != 3)
         return (-1);

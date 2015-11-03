@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <typeinfo>
+#include "Rsa.h"
 
 #define _MAGIC_ 0x0101010
 
@@ -18,7 +19,8 @@ public:
     enum Type {
 
         String = 0xb16b00b5,
-        IntVector = 0x42424242
+        IntVector = 0x42424242,
+        SSLPublicKey = 0x4ab2321a
     };
 
     //object specific constructors
@@ -32,10 +34,10 @@ public:
     };
 
     //build a bytestream from the packet
-    std::vector<unsigned char>              *build();
+    std::vector<unsigned char>              *build(Rsa *rsa = NULL);
 
     //reconstruct the packet from vector stream which will be consumed if succeeded
-    static Packet                           *fromStream(std::vector<unsigned char> &data);
+    static Packet                           *fromStream(std::vector<unsigned char> &data, Rsa *rsa = NULL);
 
     //unpack the packet to get your object back
     template <typename T>
@@ -59,6 +61,7 @@ protected:
 
     //properties
     Type _type;
+    bool _encrypted;
     std::vector<unsigned char> _data;
 
     //constructor

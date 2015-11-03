@@ -1,6 +1,9 @@
 #include "ISocket.h"
-#include "Linux/LinuxSocket.h"
+#ifdef _WIN_32
 #include "Windows/WinSocket.h"
+#else
+#include "Linux/LinuxSocket.h"
+#endif
 
 //dummy
 ISocket::ISocket(Type type) : _type(type)
