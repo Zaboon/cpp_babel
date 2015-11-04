@@ -1,6 +1,6 @@
 #include "ISocket.h"
-#ifdef _WIN_32
-#include "Windows/WinSocket.h"
+#ifdef WIN32
+#include "Windows\WinSocket.hpp"
 #else
 #include "Linux/LinuxSocket.h"
 #endif

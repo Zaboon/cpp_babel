@@ -2,14 +2,20 @@
 // Created by rustam_t on 10/6/15.
 //
 
-#ifndef PROJECT2_MUTEXVAULT_HPP
-#define PROJECT2_MUTEXVAULT_HPP
+#if defined(_WIN32) && !defined(WIN32)
+# define _WINSOCKAPI_
+# include <windows.h>
+# define WIN32
+#endif
 
-#include <vector>
-#include <map>
-#include <string>
-#include <sstream>
-#include "IMutex.hpp"
+#ifndef PROJECT2_MUTEXVAULT_HPP
+# define PROJECT2_MUTEXVAULT_HPP
+
+# include <vector>
+# include <map>
+# include <string>
+# include <sstream>
+# include "IMutex.hpp"
 
 class MutexVault
 {

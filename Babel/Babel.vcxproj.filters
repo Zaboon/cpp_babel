@@ -16,6 +16,9 @@
     <Filter Include="Header Files\Windows">
       <UniqueIdentifier>{de3d392a-1e0d-4751-aa87-d41ea0bbe2f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Linux">
+      <UniqueIdentifier>{ddacd580-3b56-4b0e-8056-300bad677af8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ISocket.h">
@@ -25,9 +28,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IMutex.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Socket.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BBException.hpp">
@@ -45,8 +45,17 @@
     <ClInclude Include="Windows\WinThread.hpp">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="WinSocket.hpp">
+    <ClInclude Include="Windows\WinSocket.hpp">
       <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Linux\LinuxMutex.hpp">
+      <Filter>Header Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="Linux\LinuxSocket.h">
+      <Filter>Header Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="Linux\LinuxThread.hpp">
+      <Filter>Header Files\Linux</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="MutexVault.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Linux\LinuxSocket.cpp">
+      <Filter>Header Files\Linux</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

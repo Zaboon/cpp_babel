@@ -123,15 +123,33 @@
     <ClInclude Include="IMutex.hpp" />
     <ClInclude Include="ISocket.h" />
     <ClInclude Include="IThread.hpp" />
+    <ClInclude Include="Linux\LinuxMutex.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Linux\LinuxSocket.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Linux\LinuxThread.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="MutexVault.hpp" />
-    <ClInclude Include="Socket.hpp" />
     <ClInclude Include="Windows\WinCriticalSession.hpp" />
     <ClInclude Include="Windows\WinMutex.hpp" />
+    <ClInclude Include="Windows\WinSocket.hpp" />
     <ClInclude Include="Windows\WinThread.hpp" />
-    <ClInclude Include="WinSocket.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ISocket.cpp" />
+    <ClCompile Include="ISocket.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Linux\LinuxSocket.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="MutexVault.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="BBException.cpp" />

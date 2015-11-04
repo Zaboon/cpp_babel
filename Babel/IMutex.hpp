@@ -2,6 +2,12 @@
 // Created by rustam_t on 10/6/15.
 //
 
+#if defined(_WIN32) && !defined(WIN32)
+# define _WINSOCKAPI_
+# include <windows.h>
+# define WIN32
+#endif
+
 #ifndef PROJECT2_IMUTEX_HPP
 #define PROJECT2_IMUTEX_HPP
 
