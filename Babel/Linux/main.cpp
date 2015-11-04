@@ -8,6 +8,7 @@
 #include "../IThread.hpp"
 #include "../Packet.h"
 #include "../ISocket.h"
+#include "../Rsa.h"
 #include "LinuxSocket.h"
 
 void testOnDisconnect(ISocket *client)
@@ -48,6 +49,8 @@ int main(int ac, char **av)
 
         server->start();
         std::cout << "Server up and ready on " << server->getIp() << " port " << server->getPort() << " status " << server->getStatus() << std::endl;
+
+        std::string s = "salut";
 
         std::string s;
         while (s != "quit") {

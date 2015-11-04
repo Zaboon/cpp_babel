@@ -26,6 +26,7 @@ public:
     //object specific constructors
     Packet(std::string &str);
     Packet(std::vector<int> &vec);
+    Packet(Rsa &);
 
     template <typename T>
     static Packet *pack(T &obj)
