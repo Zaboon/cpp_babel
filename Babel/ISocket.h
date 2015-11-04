@@ -7,10 +7,11 @@
 #ifndef ISOCKET_H_
 # define ISOCKET_H_
 
-# include <iostream>
-# include <string>
-# include <vector>
-# include "MutexVault.hpp"
+#include <iostream>
+#include <string>
+#include <vector>
+#include "MutexVault.hpp"
+#include "Rsa.h"
 
 class ISocket
 {
@@ -85,7 +86,14 @@ public:
 
 	EventHandler getOnDisconnect() const;
 
+	void attachRsa(Rsa *);
+
+	Rsa *getSendRsa() const;
+
+	Rsa *getRecvRsa() const;
+
 protected:
+
 
 	unsigned int 			_id;
 	Type					_type;
@@ -102,6 +110,8 @@ protected:
 	std::vector<unsigned char> _read_buffer;
 	std::vector<unsigned char> _write_buffer;
 
+	Rsa 					*_sendRsa;
+	Rsa 					*_recvRsa;
 };
 
 #endif /* !ISOCKET_H_ */
