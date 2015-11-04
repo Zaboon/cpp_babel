@@ -1,13 +1,18 @@
+#if defined(_WIN32) && !defined(WIN32)
+# define _WINSOCKAPI_
+# include <windows.h>
+# define WIN32
+#endif
 
 #ifndef PROJECT2_ITHREAD_HPP
-#define PROJECT2_ITHREAD_HPP
+# define PROJECT2_ITHREAD_HPP
 
-#include <iostream>
-#include <string>
-#include <vector>
+# include <iostream>
+# include <string>
+# include <vector>
 
-#include "IMutex.hpp"
-#include "MutexVault.hpp"
+# include "IMutex.hpp"
+# include "MutexVault.hpp"
 
 template<typename T, typename U>
 class IThread

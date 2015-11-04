@@ -4,13 +4,34 @@
 # include					<socketapi.h>
 # include					<WinSock2.h>
 # include					<WS2tcpip.h>
-# include					"ISocket.h"
+# include					"../ISocket.h"
 
 class WinSocket :			public ISocket
 {
 private:
+	WSADATA					_wsaData;
 	SOCKET					_socket;
 	struct addrinfo			*_addrinfo;
+
+	const std::string		&getMachineIp()
+	{
+		static std::string ip = "";
+
+		if (ip.size() == 0) {
+			if (WSAStartup(MAKEWORD(2, 2), &this->_wsaData) == 0)
+				throw "WSAStartup failed";
+			char szHostName[255];
+			gethostname(szHostName, 255);
+			struct hostent *host_entry;
+			host_entry = gethostbyname(szHostName);
+			ip = inet_ntoa(*(struct in_addr *)*host_entry->h_addr_list);
+			WSACleanup();
+		}
+		return (const_cast<const std::string &>(ip));
+	}
+
+	WinSocket(ISocket::Type type) : ISocket(type)
+	{}
 
 	/*
 	** Warning => In a multithreaded environment, WSACleanup() terminates Windows Sockets operations for all threads
@@ -20,6 +41,8 @@ private:
 		struct protoent		*pe;
 		struct addrinfo		hints;
 
+		if (WSAStartup(MAKEWORD(2, 2), &this->_wsaData) != 0)
+			throw "WSAStartup failed";
 		this->_socket = INVALID_SOCKET;
 		this->_status = ISocket::Status::Waiting;
 		this->_addrinfo = NULL;

@@ -1,9 +1,16 @@
-#pragma once
+#if defined(_WIN32) && !defined(WIN32)
+# define _WINSOCKAPI_
+# include <windows.h>
+# define WIN32
+#endif
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include "MutexVault.hpp"
+#ifndef ISOCKET_H_
+# define ISOCKET_H_
+
+# include <iostream>
+# include <string>
+# include <vector>
+# include "MutexVault.hpp"
 
 class ISocket
 {
@@ -96,3 +103,5 @@ protected:
 	std::vector<unsigned char> _write_buffer;
 
 };
+
+#endif /* !ISOCKET_H_ */

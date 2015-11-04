@@ -41,8 +41,14 @@ MutexVault::operator[](unsigned int index)
 IMutex *
 MutexVault::operator[](const std::string &index)
 {
-    if (this->_mutex_vault_map[index] == NULL)
-        this->_mutex_vault_map[index] = new LinuxMutex();
+	if (this->_mutex_vault_map[index] == NULL)
+	{
+		#ifdef WIN32
+			this->_mutex_vault_map[index] = new WinCriticalSession();
+		#else
+			this->_mutex_vault_map[index] = new LinuxMutex();
+		#endif
+	}
     return (this->_mutex_vault_map[index]);
 }
 
