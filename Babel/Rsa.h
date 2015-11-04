@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "BBException.hpp"
 
 class Rsa
 {
@@ -28,7 +29,7 @@ public:
     std::vector<unsigned char> encrypt(std::vector<unsigned char> data);
     std::vector<unsigned char> decrypt(std::vector<unsigned char> data);
 
-    std::vector<unsigned char> getPublicKey();
+    std::vector<unsigned char> &getPublicKey();
 private:
 
     RSA *_rsa;

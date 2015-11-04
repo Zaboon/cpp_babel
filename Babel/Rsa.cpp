@@ -11,35 +11,33 @@ Rsa::Rsa()
     int keylen;
     char *pem_key;
 
-    this->_rsa = RSA_generate_key(kBits, kExp, 0, 0);
+    if ((this->_rsa = RSA_generate_key(kBits, kExp, 0, 0)) == NULL)
+        throw BBException("Failed to generate RSA");
     this->_rsa_size = RSA_size(this->_rsa);
     /* To get the C-string PEM form: */
     BIO *bio;
     if ((bio = BIO_new(BIO_s_mem())) == NULL)
-        throw "Failed to init ssl";
+        throw BBException("Failed to init ssl");
 
     //get private key
     PEM_write_bio_RSAPrivateKey(bio, this->_rsa, NULL, NULL, 0, NULL, NULL);
     keylen = BIO_pending(bio);
     if ((pem_key = reinterpret_cast<char *>(calloc(keylen + 1, 1))) == NULL)
-        throw "Malloc failed";
+        throw BBException("Malloc failed");
     BIO_read(bio, pem_key, keylen);
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(keylen); i++)
         this->_priv_key.push_back(pem_key[i]);
-    printf("%s", pem_key);
-
     free(pem_key);
 
     PEM_write_bio_RSAPublicKey(bio, this->_rsa);
     keylen = BIO_pending(bio);
     if ((pem_key = reinterpret_cast<char *>(calloc(keylen + 1, 1))) == NULL)
-        throw "Malloc failed";
+        throw BBException("Malloc failed");
     BIO_read(bio, pem_key, keylen);
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(keylen); i++)
         this->_pub_key.push_back(pem_key[i]);
-    printf("%s", pem_key);
     BIO_free_all(bio);
     free(pem_key);
 }
@@ -49,9 +47,14 @@ Rsa::Rsa(std::vector<unsigned char> &public_key)
     BIO *keybio;
     int keylen;
 
-    if ((keybio = BIO_new_mem_buf(&public_key[0], -1)) == NULL)
-        throw "Failed to init ssl";
-    PEM_read_bio_RSA_PUBKEY(keybio, &(this->_rsa), NULL, NULL);
+    //this->_rsa = static_cast<RSA *>(malloc(sizeof(RSA)));
+    for (unsigned int i = 0; i < public_key.size(); i++)
+        std::cout << public_key[i];
+    public_key.push_back(0);
+    if ((keybio = BIO_new_mem_buf(&public_key[0], public_key.size())) == NULL)
+        throw BBException("Failed to init ssl");
+    if ((PEM_read_bio_RSAPublicKey(keybio, &(this->_rsa), NULL, NULL)) == NULL)
+        throw BBException("Failed to generated RSA");
     this->_rsa_size = RSA_size(this->_rsa);
     BIO_free_all(keybio);
 }
@@ -75,9 +78,9 @@ Rsa::encrypt(std::vector<unsigned char> data)
         return (result);
     initial_length = static_cast<int>(data.size());
     current_length = 0;
+    tmp = static_cast<unsigned char *>(malloc(this->_rsa_size));
     while (initial_length > 0) {
 
-        tmp = static_cast<unsigned char *>(malloc(this->_rsa_size));
         flen = (initial_length < this->_rsa_size - 11) ? initial_length : this->_rsa_size - 41;
         if ((res = RSA_public_encrypt(flen, &data[current_length], tmp, this->_rsa, RSA_PKCS1_PADDING)) == -1)
             return (result);
@@ -85,8 +88,8 @@ Rsa::encrypt(std::vector<unsigned char> data)
             result.push_back(tmp[i]);
         initial_length -= res;
         current_length += res;
-        free(tmp);
     }
+    free(tmp);
     return (result);
 }
 
@@ -116,4 +119,10 @@ Rsa::decrypt(std::vector<unsigned char> data)
         free(tmp);
     }
     return (result);
+}
+
+std::vector<unsigned char> &
+Rsa::getPublicKey()
+{
+    return (this->_pub_key);
 }

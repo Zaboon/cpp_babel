@@ -14,11 +14,12 @@
 #include <stdio.h>
 #include "LinuxThread.hpp"
 #include "../ISocket.h"
+#include "../BBException.hpp"
 
 #define MAX_CLIENTS 42
 #define TIMEOUT 5
-#define READ_HEAP 4096
-#define MAX_BUFFER_SIZE 21920
+#define READ_HEAP 21920
+#define MAX_BUFFER_SIZE 40960
 
 class LinuxSocket : public ISocket
 {

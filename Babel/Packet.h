@@ -48,6 +48,8 @@ public:
             return (reinterpret_cast<T *>(this->getString()));
         else if (typeid(T) == typeid(std::vector<int>))
             return (reinterpret_cast<T *>(this->getIntVector()));
+        else if (typeid(T) == typeid(Rsa))
+            return (reinterpret_cast<T *>(this->getRsa()));
         return (NULL);
     };
 
@@ -55,6 +57,8 @@ public:
     static unsigned int                     getHeaderSize();
 
     Type                                    getType() const;
+
+    bool                                    isEncrypted() const;
 
     std::vector<unsigned char> const        &getData() const;
 
@@ -73,6 +77,7 @@ protected:
     //object getters
     std::string *getString();
     std::vector<int> *getIntVector();
+    Rsa *getRsa();
 };
 
 #endif //CPP_BABEL_PACKET_H

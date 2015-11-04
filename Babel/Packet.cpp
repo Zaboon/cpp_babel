@@ -28,6 +28,12 @@ Packet::Packet(std::vector<int> &vec) : _type(Packet::IntVector)
     this->_encrypted = false;
 }
 
+Packet::Packet(Rsa &rsa) : _type(Packet::SSLPublicKey)
+{
+    this->_data = rsa.getPublicKey();
+    this->_encrypted = false;
+}
+
 //static
 unsigned int
 Packet::getHeaderSize()
@@ -126,6 +132,12 @@ Packet::getType() const
     return (_type);
 }
 
+bool
+Packet::isEncrypted() const
+{
+    return (this->_encrypted);
+}
+
 std::string *
 Packet::getString()
 {
@@ -157,4 +169,23 @@ Packet::getIntVector()
         }
     }
     return (tmp);
+}
+
+Rsa *
+Packet::getRsa()
+{
+    Rsa *result;
+
+    if (this->_type == Packet::SSLPublicKey)
+    {
+        try
+        {
+            result = new Rsa(this->_data);
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+    }
+    return (result);
 }
