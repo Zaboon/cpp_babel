@@ -7,7 +7,7 @@
 const std::string &
 LinuxSocket::getMachineIp()
 {
-    static std::string ip = "";
+    static std::string ip;
 
     if (ip.size() == 0) {
 
@@ -158,20 +158,20 @@ LinuxSocket::LinuxSocket(int port, const std::string &proto) : ISocket(ISocket::
     struct sockaddr_in    s_in;
 
     if (this->_ip.empty())
-        throw "No ip detected!";
+        throw BBException("No ip detected!");
     this->_status = ISocket::Waiting;
     if ((pe = getprotobyname(proto.c_str())) == NULL)
-        throw "getprotobyname failed";
+        throw BBException("getprotobyname failed");
     if ((this->_socket = socket(AF_INET, SOCK_STREAM, pe->p_proto)) == -1)
-        throw "socket failed";
+        throw BBException("socket failed");
     this->_status = ISocket::Ready;
     s_in.sin_family = AF_INET;
     s_in.sin_port = htons(static_cast<uint16_t>(port));
     s_in.sin_addr.s_addr = INADDR_ANY;
     if (bind(this->_socket, reinterpret_cast<struct sockaddr *>(&s_in), sizeof(s_in)) == -1)
-        throw "bind failed";
+        throw BBException("bind failed");
     if (listen(this->_socket, MAX_CLIENTS) == -1)
-        throw "listen failed";
+        throw BBException("listen failed");
     this->_socketOpened = true;
 }
 
@@ -209,9 +209,9 @@ LinuxSocket::LinuxSocket(const std::string &ip, int port, const std::string &pro
     struct protoent       *pe;
 
     if ((pe = getprotobyname(proto.c_str())) == NULL)
-        throw "getprotobyname failed";
+        throw BBException("getprotobyname failed");
     if ((this->_socket = socket(AF_INET, SOCK_STREAM, pe->p_proto)) == -1)
-        throw "socket failed";
+        throw BBException("socket failed");
     this->_port = port;
     this->_ip = ip;
     this->_socketOpened = true;
