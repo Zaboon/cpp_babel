@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BBException.hpp" />
+    <ClInclude Include="Contact.hpp" />
     <ClInclude Include="IMutex.hpp" />
     <ClInclude Include="ISocket.h" />
     <ClInclude Include="IThread.hpp" />

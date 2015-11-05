@@ -44,13 +44,13 @@ Rsa::Rsa()
 
 Rsa::Rsa(std::vector<unsigned char> &public_key)
 {
+    const int kBits = 2048;
+    const int kExp = 65537;
     BIO *keybio;
-    int keylen;
+    unsigned char *ptr;
 
-    //this->_rsa = static_cast<RSA *>(malloc(sizeof(RSA)));
-    for (unsigned int i = 0; i < public_key.size(); i++)
-        std::cout << public_key[i];
-    public_key.push_back(0);
+    if ((this->_rsa = RSA_generate_key(kBits, kExp, 0, 0)) == NULL)
+        throw BBException("Failed to generate RSA");
     if ((keybio = BIO_new_mem_buf(&public_key[0], public_key.size())) == NULL)
         throw BBException("Failed to init ssl");
     if ((PEM_read_bio_RSAPublicKey(keybio, &(this->_rsa), NULL, NULL)) == NULL)

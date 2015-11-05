@@ -19,17 +19,43 @@ void testOnDisconnect(ISocket *client)
 void testOnReceive(ISocket *client)
 {
     std::vector<unsigned char> tmp;
+    Packet *p;
 
     tmp = client->read(0);
-    std::cout << "received message from " << client->getIp() << " client no : " << client->getId() << " (msg_length : " << tmp.size() << ") : ";
-    for (unsigned int i = 0; i < tmp.size(); i++)
-        std::cout << static_cast<char>(tmp[i]);
+    if (client->getSendRsa() == 0) {
+        if ((p = Packet::fromStream(tmp)) == NULL) {
+            std::cout << "nope!" << std::endl;
+            return;
+        }
+        else {
+
+            Rsa *r;
+            if (p->getType() == Packet::SSLPublicKey && (r = p->unpack<Rsa>()) != NULL) {
+                client->attachRsa(r);
+                std::cout << "ok for public key!" << std::endl;
+            }
+        }
+    }
+    else {
+        std::cout << "Received message from " << client->getIp() << " for client no : " << client->getId() <<
+        " (msg_length : " << tmp.size() << ") : ";
+        for (unsigned int i = 0; i < tmp.size(); i++)
+            std::cout << static_cast<char>(tmp[i]);
+    }
     std::cout << std::endl;
 }
 
 void testOnConnect(ISocket *client)
 {
-    std::cout <<  "Client no : " << client->getId() << " from " << client->getIp() << " connected!" << std::endl;
+    //send him my RSA
+    Packet *p = new Packet(*(client->getRecvRsa()));
+    p->build();
+    std::vector<unsigned char> *pack = p->build();
+    for (unsigned int i = 0; i < client->getRecvRsa()->getPublicKey().size(); i++)
+        std::cout << client->getRecvRsa()->getPublicKey()[i];
+    client->write(*pack);
+    delete pack;
+    std::cout << "Server on " << client->getIp() << " for client no : " << client->getId() << " accepted connection!" << std::endl;
 }
 
 int main(int ac, char **av)
@@ -49,8 +75,6 @@ int main(int ac, char **av)
 
         server->start();
         std::cout << "Server up and ready on " << server->getIp() << " port " << server->getPort() << " status " << server->getStatus() << std::endl;
-
-        std::string s = "salut";
 
         std::string s;
         while (s != "quit") {

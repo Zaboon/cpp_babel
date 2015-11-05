@@ -38,12 +38,16 @@ public:
     std::vector<unsigned char>              *build(Rsa *rsa = NULL);
 
     //reconstruct the packet from vector stream which will be consumed if succeeded
-    static Packet                           *fromStream(std::vector<unsigned char> &data, Rsa *rsa = NULL);
+    static Packet                           *fromStream(std::vector<unsigned char> &data);
 
     //unpack the packet to get your object back
     template <typename T>
-    T *unpack()
+    T *unpack(Rsa *rsa = NULL)
     {
+        if (rsa != NULL && this->_encrypted) {
+            this->_data = rsa->decrypt(this->_data);
+            this->_encrypted = false;
+        }
         if (typeid(T) == typeid(std::string))
             return (reinterpret_cast<T *>(this->getString()));
         else if (typeid(T) == typeid(std::vector<int>))

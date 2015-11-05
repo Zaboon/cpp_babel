@@ -47,7 +47,7 @@ Packet::getHeaderSize()
 
 //get packet from bytestream (bytestream is then consumed)
 Packet *
-Packet::fromStream(std::vector<unsigned char> &data, Rsa *rsa)
+Packet::fromStream(std::vector<unsigned char> &data)
 {
     unsigned int headerSize = Packet::getHeaderSize();
     if (data.size() <= headerSize)
@@ -65,11 +65,7 @@ Packet::fromStream(std::vector<unsigned char> &data, Rsa *rsa)
     newPacket->_type = *r_type;
     newPacket->_encrypted = (*r_encrypted == 1);
     for (unsigned int i = 0; i < *r_size; i++)
-        new_data.push_back(data[i + headerSize]);
-    if (rsa != NULL && newPacket->_encrypted)
-        newPacket->_data = rsa->decrypt(new_data);
-    else
-        newPacket->_data = new_data;
+        newPacket->_data.push_back(data[i + headerSize]);
     //consume flux
     data.erase(data.begin(), data.begin() + headerSize + *r_size);
     return (newPacket);
