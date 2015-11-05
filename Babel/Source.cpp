@@ -1,6 +1,5 @@
 #include		<iostream>
 #include		<string>
-#include		"Windows\WinSocket.hpp"
 
 void			superFunction()
 {
@@ -14,7 +13,7 @@ void			superFunction()
 
 int				main()
 {
-	std::cout << "Nicolas est pas le plus beau" << std::endl;
+	std::cout << "ip" << std::endl;
 	
 	getchar();
 	return (0);
