@@ -57,6 +57,9 @@
     <ClInclude Include="Linux\LinuxThread.hpp">
       <Filter>Header Files\Linux</Filter>
     </ClInclude>
+    <ClInclude Include="Contact.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
