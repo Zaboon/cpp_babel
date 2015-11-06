@@ -3,11 +3,16 @@
 
 # pragma comment(lib, "Ws2_32.lib")
 # define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 # define MAX_CLIENTS				42
+# define MAX_BUFFER_SIZE			40960
+# define READ_HEAP					21920
+# define TIMEOUT					5
 
 # include							<socketapi.h>
 # include							<WinSock2.h>
 # include							<WS2tcpip.h>
+# include							<MSWSock.h>
 # include							"WinThread.hpp"
 # include							"../BBException.hpp"
 # include							"../ISocket.h"
@@ -80,7 +85,63 @@ private:
 
 	void							launchClient(unsigned int thread_id, WinSocket *client)
 	{
-		// TO DO
+		MutexVault					*vault = MutexVault::getMutexVault();
+		WSAPOLLFD					ufd[2];
+		char						buffer[READ_HEAP];
+		int							pollReturn;
+		int							sendReturn;
+		int							recvReturn;
+		
+		client->_status = ISocket::Status::Running;
+		ufd[0].fd = (ufd[1].fd = client->_socket);
+		ufd[0].events = POLLIN;
+		ufd[1].events = POLLOUT;
+		if (client->getOnConnect() != NULL)
+			client->getOnConnect()(client);
+		while (client->getStatus() != ISocket::Status::Canceled)
+		{
+			if ((pollReturn = WSAPoll(&ufd[0], 1, TIMEOUT)) == SOCKET_ERROR)
+				client->_status = ISocket::Status::Canceled;
+			else if (pollReturn > 0)
+			{
+				(*vault)["read" + MutexVault::toString(client->getId())]->lock(true);
+				if (client->_read_buffer.size() > MAX_BUFFER_SIZE)
+					client->_read_buffer.clear();
+				if ((recvReturn = recv(client->_socket, &buffer[0], READ_HEAP, 0)) == SOCKET_ERROR)
+					client->_status = ISocket::Canceled;
+				else if (recvReturn == 0)
+					client->_status = ISocket::Canceled;
+				else {
+					for (unsigned int i = 0; i < recvReturn; i++)
+						client->_read_buffer.push_back(buffer[i]);
+					//while protected -> summon onReceive
+					if (client->getOnReceive() != NULL)
+						client->getOnReceive()(client);
+				}
+				(*vault)["read" + MutexVault::toString(client->getId())]->unlock();
+			}
+			else if (client->getStatus() != ISocket::Canceled && !client->_write_buffer.empty())
+			{
+				if ((pollReturn = WSAPoll(&ufd[1], 1, TIMEOUT)) == SOCKET_ERROR)
+					client->_status = ISocket::Canceled;
+				if (pollReturn > 0)
+				{
+					//begin protected action
+					(*vault)["write" + MutexVault::toString(client->getId())]->lock(true);
+					if ((sendReturn = send(client->_socket, reinterpret_cast<char *>(&(client->_write_buffer[0])), client->_write_buffer.size(), 0)) == SOCKET_ERROR)
+						client->_status = ISocket::Canceled;
+					//delete sent data
+					if (sendReturn > 0)
+						client->_write_buffer.erase(client->_write_buffer.begin(), client->_write_buffer.begin() + sendReturn);
+					(*vault)["write" + MutexVault::toString(client->getId())]->unlock();
+					//end protected action
+				}
+				//no event
+			}
+		}
+		client->cancel();
+		if (client->getOnDisconnect() != NULL)
+			client->getOnDisconnect()(client);
 	}
 
 	// DUMMY
