@@ -9,6 +9,7 @@
 #include <vector>
 #include <typeinfo>
 #include "Rsa.h"
+#include "Identity.hpp"
 
 #define _MAGIC_ 0x0101010
 
@@ -20,13 +21,34 @@ public:
 
         String = 0xb16b00b5,
         IntVector = 0x42424242,
+        CharVector = 0x51515151,
         SSLPublicKey = 0x4ab2321a
     };
 
     //object specific constructors
+    Packet(Identity& id);
     Packet(std::string &str);
     Packet(std::vector<int> &vec);
     Packet(Rsa &);
+
+    static std::vector<unsigned char>& stringToStream(char *buf, int const size)
+    {
+        std::vector<unsigned char>* stream = new std::vector<unsigned char>();
+
+        for (int i=0; i < size; ++i)
+        {
+            stream->push_back(buf[i]);
+        }
+        return (*stream);
+    }
+
+    static void streamToString(std::vector<unsigned char>* stream, unsigned char* data)
+    {
+        for (unsigned int i=0; i < stream->size(); ++i)
+        {
+            data[i] = (*stream)[i];
+        }
+    }
 
     template <typename T>
     static Packet *pack(T &obj)
@@ -38,7 +60,7 @@ public:
     std::vector<unsigned char>              *build(Rsa *rsa = NULL);
 
     //reconstruct the packet from vector stream which will be consumed if succeeded
-    static Packet                           *fromStream(std::vector<unsigned char> &data);
+    static Packet                           *fromStream(std::vector<unsigned char> &data, Rsa *rsa = NULL);
 
     //unpack the packet to get your object back
     template <typename T>
@@ -54,6 +76,8 @@ public:
             return (reinterpret_cast<T *>(this->getIntVector()));
         else if (typeid(T) == typeid(Rsa))
             return (reinterpret_cast<T *>(this->getRsa()));
+        else if (typeid(T) == typeid(Identity))
+            return (reinterpret_cast<T *>(this->getIdentity()));
         return (NULL);
     };
 
@@ -64,7 +88,10 @@ public:
 
     bool                                    isEncrypted() const;
 
-    std::vector<unsigned char> const        &getData() const;
+    std::vector<unsigned char>              &getData();
+
+    Identity*                               getIdentity();
+    std::string *getString();
 
 protected:
 
@@ -79,7 +106,6 @@ protected:
     virtual ~Packet() {};
 
     //object getters
-    std::string *getString();
     std::vector<int> *getIntVector();
     Rsa *getRsa();
 };

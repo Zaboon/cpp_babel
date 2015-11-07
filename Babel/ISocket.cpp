@@ -1,4 +1,5 @@
 #include "ISocket.h"
+#include "Packet.h"
 #ifdef WIN32
 #include "Windows\WinSocket.hpp"
 #else
@@ -12,6 +13,7 @@ ISocket::ISocket(Type type) : _type(type)
     this->_onReceive = NULL;
     this->_onDisconnect = NULL;
     this->_recvRsa = new Rsa();
+    this->_mustEncrypt = false;
 };
 
 ISocket::ISocket(Type type, const std::string &ip, int port) : _type(type), _ip(ip), _port(port)
@@ -20,6 +22,7 @@ ISocket::ISocket(Type type, const std::string &ip, int port) : _type(type), _ip(
     this->_onReceive = NULL;
     this->_onDisconnect = NULL;
     this->_recvRsa = new Rsa();
+    this->_mustEncrypt = false;
 };
 
 ISocket *
@@ -80,6 +83,9 @@ ISocket::addNewClient(ISocket *newClient)
     if ((handler[2] = this->getOnDisconnect()) != NULL)
         newClient->attachOnDisconnect(handler[2]);
 
+    //inherit rsa
+    newClient->_recvRsa = this->getRecvRsa();
+
     IMutex *_targetList = (*MutexVault::getMutexVault())["serverTargets"];
     _targetList->lock(true);
     this->_targets.push_back(newClient);
@@ -111,6 +117,16 @@ ISocket::read(unsigned int bytes)
     return (tmp);
 }
 
+Packet *
+ISocket::readPacket(unsigned int bytes)
+{
+    std::vector<unsigned char> data;
+    Packet *p;
+
+    data = this->read(0);
+    return (Packet::fromStream(data, (this->_mustEncrypt ? this->getRecvRsa() : NULL)));
+}
+
 void
 ISocket::write(const std::vector<unsigned char> &data, unsigned int id)
 {
@@ -136,6 +152,16 @@ ISocket::write(const std::vector<unsigned char> &data, unsigned int id)
                 this->_targets[i]->write(data);
         mutex->unlock();
     }
+}
+
+void
+ISocket::writePacket(Packet *packet, unsigned int id)
+{
+    std::vector<unsigned char> *write;
+
+    write = packet->build((this->_mustEncrypt ? this->getSendRsa() : NULL));
+    this->write(*write, id);
+    delete write;
 }
 
 std::vector<unsigned char>
@@ -273,8 +299,8 @@ ISocket::attachRsa(Rsa *rsa)
 
     mutex = (*MutexVault::getMutexVault())["sendRsa" + MutexVault::toString(this->_id)];
     mutex->lock(true);
-    if (this->_sendRsa == NULL)
-        this->_sendRsa = rsa;
+    this->_sendRsa = rsa;
+    this->_mustEncrypt = true;
     mutex->unlock();
 }
 
@@ -302,4 +328,10 @@ ISocket::getRecvRsa() const
     ptr = this->_recvRsa;
     mutex->unlock();
     return (ptr);
+}
+
+void
+ISocket::setMustEncrypt(bool value)
+{
+    this->_mustEncrypt = value;
 }
