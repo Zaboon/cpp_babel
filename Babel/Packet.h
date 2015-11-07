@@ -17,11 +17,14 @@ class Packet
 {
 public:
 
+    virtual ~Packet() {};
+
     enum Type {
 
         String = 0xb16b00b5,
         IntVector = 0x42424242,
         CharVector = 0x51515151,
+        Id = 0x12345678,
         SSLPublicKey = 0x4ab2321a
     };
 
@@ -102,8 +105,6 @@ protected:
 
     //constructor
     Packet();
-
-    virtual ~Packet() {};
 
     //object getters
     std::vector<int> *getIntVector();

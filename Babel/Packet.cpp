@@ -7,7 +7,7 @@ Packet::Packet()
     this->_encrypted = false;
 }
 
-Packet::Packet(Identity& id) : _type(Packet::CharVector)
+Packet::Packet(Identity& id) : _type(Packet::Id)
 {
     unsigned char *instr;
     unsigned char *port;
@@ -230,6 +230,8 @@ Identity*       Packet::getIdentity()
     char        _username[64];
     char        _ip[32];
 
+    if (this->_type != Packet::Id)
+        return (NULL);
     _instruction = reinterpret_cast<Instruct *>(&_data[0]);
     _port = reinterpret_cast<unsigned int *>(&_data[4]);
     for (unsigned int i = 0; i < sizeof(_username); ++i)

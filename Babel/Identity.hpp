@@ -24,6 +24,13 @@ enum Instruct
 class Identity
 {
 public:
+
+    enum Status
+    {
+        Available,
+        NotAvailable
+    };
+
     Identity(std::string const& name, Instruct const instruction)
     {
         memset(_username, 0, sizeof(_username));
@@ -33,6 +40,7 @@ public:
         _port = 0;
         _instruction = instruction;
     }
+
     Identity(std::string const& name, std::string const& ip, unsigned int const port, Instruct const instruction)
     {
         memset(_username, 0, sizeof(_username));
@@ -44,22 +52,37 @@ public:
         _port = port;
         _instruction = instruction;
     }
+
     Instruct    getInstruct() const
     {
         return (_instruction);
     }
+
     char    *getUsername()
     {
         return (_username);
     }
+
     char    *getIp()
     {
         return (_ip);
     }
+
     int     getPort() const
     {
         return (_port);
     }
+
+    void    setStatus(Status status)
+    {
+        this->_status = status;
+    }
+
+    Status  getStatus() const
+    {
+        return (this->_status);
+    }
+
     std::vector<unsigned char>&     serialize()
     {
         std::vector<unsigned char>  *serialized = new std::vector<unsigned char>(IDCLASSSIZE);
@@ -82,6 +105,7 @@ public:
         }
         return (*serialized);
     }
+
     static Identity&    unserialize(std::vector<unsigned char>& data)
     {
         Instruct             *_instruction;
@@ -100,11 +124,13 @@ public:
         Identity *id = new Identity(_username, _ip, *_port, *_instruction);
         return (*id);
     }
+
 private:
     Instruct    _instruction;
     unsigned int         _port;
     char        _username[64];
     char        _ip[32];
+    Status      _status;
 };
 
 #endif
