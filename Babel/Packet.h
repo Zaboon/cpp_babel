@@ -23,12 +23,13 @@ public:
 
         String = 0xb16b00b5,
         IntVector = 0x42424242,
-        CharVector = 0x51515151,
         Id = 0x12345678,
+        Inst = 0x51515151,
         SSLPublicKey = 0x4ab2321a
     };
 
     //object specific constructors
+    Packet(Instruct inst);
     Packet(Identity& id);
     Packet(std::string &str);
     Packet(std::vector<int> &vec);
@@ -95,6 +96,8 @@ public:
 
     Identity*                               getIdentity();
     std::string *getString();
+
+    Instruct*                               getInstruction();
 
 protected:
 

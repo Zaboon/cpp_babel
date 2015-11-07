@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <vector>
+# include "MutexVault.hpp"
 
 enum Instruct
 {
@@ -24,12 +25,6 @@ enum Instruct
 class Identity
 {
 public:
-
-    enum Status
-    {
-        Available,
-        NotAvailable
-    };
 
     Identity(std::string const& name, Instruct const instruction)
     {
@@ -58,6 +53,11 @@ public:
         return (_instruction);
     }
 
+    void        setInstruct(Instruct instruct)
+    {
+        this->_instruction = instruct;
+    }
+
     char    *getUsername()
     {
         return (_username);
@@ -73,14 +73,14 @@ public:
         return (_port);
     }
 
-    void    setStatus(Status status)
+    bool    hasAdressAndName() const
     {
-        this->_status = status;
+        return (strlen(this->_ip) != 0 && this->_port != 0 && strlen(this->_username) != 0);
     }
 
-    Status  getStatus() const
+    bool    hasName() const
     {
-        return (this->_status);
+        return (strlen(this->_username) != 0);
     }
 
     std::vector<unsigned char>&     serialize()
@@ -125,12 +125,39 @@ public:
         return (*id);
     }
 
+    void setPeer(Identity *peer)
+    {
+        IMutex *mutex;
+
+        if (!this->hasName())
+            return;
+        mutex = (*MutexVault::getMutexVault())["peer" + MutexVault::toString(this->_username)];
+        mutex->lock(true);
+        this->_peer = peer;
+        mutex->unlock();
+    }
+
+    Identity *getPeer()
+    {
+        IMutex *mutex;
+        Identity *peer = NULL;
+
+        if (this->hasName()) {
+
+            mutex = (*MutexVault::getMutexVault())["peer" + MutexVault::toString(this->_username)];
+            mutex->lock(true);
+            peer = this->_peer;
+            mutex->unlock();
+        }
+        return (peer);
+    }
+
 private:
-    Instruct    _instruction;
-    unsigned int         _port;
-    char        _username[64];
-    char        _ip[32];
-    Status      _status;
+    Instruct        _instruction;
+    unsigned int    _port;
+    char            _username[64];
+    char            _ip[32];
+    Identity        *_peer;
 };
 
 #endif

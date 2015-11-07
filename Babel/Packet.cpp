@@ -7,6 +7,17 @@ Packet::Packet()
     this->_encrypted = false;
 }
 
+Packet::Packet(Instruct instruction) : _type(Packet::Inst)
+{
+    unsigned char *instr;
+
+    instr = reinterpret_cast<unsigned char *>(&instruction);
+
+    for (unsigned int i = 0; i < sizeof(instr); i++)
+        this->_data.push_back(instr[i]);
+    this->_encrypted = false;
+}
+
 Packet::Packet(Identity& id) : _type(Packet::Id)
 {
     unsigned char *instr;
@@ -223,7 +234,8 @@ Packet::getRsa()
     return (result);
 }
 
-Identity*       Packet::getIdentity()
+Identity*
+Packet::getIdentity()
 {
     Instruct             *_instruction;
     unsigned int         *_port;
@@ -234,7 +246,7 @@ Identity*       Packet::getIdentity()
         return (NULL);
     _instruction = reinterpret_cast<Instruct *>(&_data[0]);
     _port = reinterpret_cast<unsigned int *>(&_data[4]);
-    for (unsigned int i = 0; i < sizeof(_username); ++i)
+    for (unsigned int i = 0; i < sizeof(_username); i++)
     {
         _username[i] = _data[i + sizeof(Instruct) + sizeof(unsigned int)];
         if (i < 32)
@@ -242,4 +254,19 @@ Identity*       Packet::getIdentity()
     }
     Identity *id = new Identity(_username, _ip, *_port, *_instruction);
     return (id);
+}
+
+Instruct*
+Packet::getInstruction()
+{
+    Instruct            *_instruction;
+    unsigned char       *ptr;
+
+    if (this->_type != Packet::Inst)
+        return (NULL);
+    _instruction = new Instruct;
+    ptr = reinterpret_cast<unsigned char *>(_instruction);
+    for (unsigned int i = 0; i < sizeof(Instruct); i++)
+        ptr[i] = this->_data[i];
+    return (_instruction);
 }

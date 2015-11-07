@@ -26,9 +26,34 @@ public:
         return (_this);
     }
 
-    Identity *getPeopleByClient()
+    ISocket  *getByIdentity(Identity *identity)
     {
+        IMutex *mutex;
 
+        if (identity == NULL)
+            return (NULL);
+        mutex = (*MutexVault::getMutexVault())["people"];
+        mutex->lock(true);
+    }
+
+    ISocket *getByUsername(char *username)
+    {
+        IMutex *mutex;
+        ISocket *p = NULL;
+
+        if (username == NULL)
+            return (p);
+        mutex = (*MutexVault::getMutexVault())["people"];
+        mutex->lock(true);
+        for (std::map<ISocket *, Identity *>::iterator it = this->_people.begin(); it != this->_people.end(); it++)
+        {
+            if (strcmp(it->second->getUsername(), username) == 0) {
+
+                p = it->first;
+                break;
+            }
+        }
+        return (p);
     }
 
     static void onDisconnect(ISocket *client)
@@ -51,15 +76,48 @@ public:
 
     static void executeIdentity(Identity *identity, ISocket *client)
     {
+        IMutex *mutex;
+        BabelServer *server = BabelServer::getInstance();
+
+        if (identity == NULL)
+            return;
+        mutex = (*MutexVault::getMutexVault())["people"];
+        mutex->lock(true);
         switch (identity->getInstruct())
         {
             case (CONNECTION) :
-                if (BabelServer::getInstance()->_people[client] != NULL &&
-                        strlen(identity->getIp()) != 0 && identity->getPort() != 0 && strlen(identity->getUsername()) != 0)
+                if (server->_people[client] != NULL && identity->hasAdressAndName() &&
+                        server->getByUsername(identity->getUsername()) == NULL)
                 {
-                    return;
+                    server->_people[client] = identity;
+                    client->writePacket(new Packet(OK));
                 }
+                else
+                    client->writePacket(new Packet(KO));
+                break;
+            case (ASKCALL) :
+                if (server->_people[client] != NULL && identity->hasName() &&
+                        server->_people[client]->getPeer() == NULL)
+                {
+                    ISocket *peer = server->getByUsername(identity->getUsername());
+                    if (server->_people[peer]->getPeer() == NULL)
+                    {
+                        server->_people[client]->setPeer(server->_people[peer]);
+                        server->_people[peer]->setPeer(server->_people[client]);
+
+                        server->_people[client]->setInstruct(OK);
+                        peer->writePacket(new Packet(*(server->_people[client])));
+                        server->_people[peer]->setInstruct(RCVCALL);
+                        client->writePacket(new Packet(*(server->_people[peer])));
+                    }
+                    else
+                        client->writePacket(new Packet(KO));
+                }
+                else
+                    client->writePacket(new Packet(KO));
+                break;
         }
+        mutex->unlock();
         return;
     }
 
@@ -82,7 +140,7 @@ public:
 
                 if (packet->getType() == Packet::Id)
                     BabelServer::executeIdentity(packet->unpack<Identity>(rsa), client);
-//                else if (packet->getType() == Packet::Instruction)
+//                else if (packet->getType() == Packet::Inst)
 //                    BabelServer::executeInstruction(packet->unpack<Instruction>(rsa), client);
                 else
                     res = false;
