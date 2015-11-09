@@ -155,13 +155,14 @@ ISocket::write(const std::vector<unsigned char> &data, unsigned int id)
 }
 
 void
-ISocket::writePacket(Packet *packet, unsigned int id)
+ISocket::writePacket(Packet *packet, unsigned int id, bool del)
 {
     std::vector<unsigned char> *write;
 
     write = packet->build((this->_mustEncrypt ? this->getSendRsa() : NULL));
     this->write(*write, id);
-    delete write;
+    if (del)
+        delete write;
 }
 
 std::vector<unsigned char>

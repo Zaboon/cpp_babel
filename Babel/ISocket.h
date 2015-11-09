@@ -61,7 +61,7 @@ public:
 
 	void write(const std::vector<unsigned char> &data, unsigned int id = 0);
 
-	void writePacket(Packet *packet, unsigned int id = 0);
+	void writePacket(Packet *packet, unsigned int id = 0, bool del = true);
 
 	std::vector<unsigned char> operator<<(ISocket *client);
 
