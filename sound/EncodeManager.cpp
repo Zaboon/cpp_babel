@@ -3,7 +3,9 @@
 EncodeManager::EncodeManager()
 {
   _enc = opus_encoder_create(SAMPLE_RATE, 1, OPUS_APPLICATION_VOIP, &_err);
-  _dev = opus_decoder_create(SAMPLE_RATE, 1, &_err);
+  _dec = opus_decoder_create(SAMPLE_RATE, 1, &_err);
+  opus_encoder_ctl(this->_enc, OPUS_GET_BANDWIDTH(&this->_len));
+  this->_len = FRAMES_PER_BUFFER;
 }
 
 EncodeManager::~EncodeManager()
@@ -22,6 +24,6 @@ unsigned char*	EncodeManager::encodeAudio(const float* frame, int* enc_ret)
 
 void		EncodeManager::decodeAudio(const unsigned char* data, SAMPLE* out, int enc_ret)
 {
-  if (opus_decode_float(_dec, data, retenc, out, FRAMES_PER_BUFFER, 0) != OPUS_OK)
+  if (opus_decode_float(_dec, data, enc_ret, out, FRAMES_PER_BUFFER, 0) < 0)
     std::cerr << "Error decoding" << std::endl;
 }
