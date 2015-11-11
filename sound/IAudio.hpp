@@ -18,7 +18,7 @@ public:
   virtual int	setupStream() = 0;
   virtual int	startStream() = 0;
   virtual int	stopStream() = 0;
-  virtual AbsEncode*	getEnc() = 0;
+  virtual IEncode*	getEnc() = 0;
   virtual void	setData(unsigned char *) = 0;
   virtual const int	getRetenc() const = 0;
   virtual void	setRetenc(int) = 0;

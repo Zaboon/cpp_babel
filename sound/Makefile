@@ -2,15 +2,15 @@ CC	=	g++
 
 RM	=	rm -f
 
-SRC	=	SoundManager.cpp	\
-		EncodeManager.cpp	\
+SRC	=	EncodeManager.cpp	\
+		SoundManager.cpp	\
 		main.cpp
 
 OBJ	=	$(SRC:.cpp=.o)
 
 NAME	=	Test
 
-LIBS	=	-lportaudio -lopus
+LIBS	=	-L. -lopus -lrt -lasound -ljack -lpthread -lm -lportaudio
 
 all	:	$(NAME)
 

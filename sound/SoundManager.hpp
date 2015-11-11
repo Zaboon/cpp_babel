@@ -3,7 +3,6 @@
 #include "IAudio.hpp"
 #include "EncodeManager.hpp"
 #include "portaudio.h"
-#include "audiosettings.h"
 
 class SoundManager : public IAudio
 {
@@ -13,7 +12,7 @@ private:
   PaError		_err;
   PaStreamParameters	_inParam;
   PaStreamParameters	_outParam;
-  AbsEncode*		_opus;
+  IEncode*		_opus;
   SAMPLE		_buff[FRAMES_PER_BUFFER];
   bool			_run;
   unsigned char*	_data;
@@ -28,10 +27,10 @@ public:
   virtual void		initOutput();
   virtual int		setupStream();
 
-  virtual void		errorAudio(int);
+  virtual void		errorAudio();
   virtual int		startStream();
   virtual int		stopStream();
-  virtual AbsEncode*	getEnc();
+  virtual IEncode*	getEnc();
   virtual const std::pair<const unsigned char *, const int> getData() const;
   virtual void		setData(unsigned char *);
   virtual const int	getRetenc() const;

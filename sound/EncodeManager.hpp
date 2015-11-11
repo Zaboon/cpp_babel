@@ -17,5 +17,5 @@ public:
   virtual ~EncodeManager();
 
   virtual unsigned char*	encodeAudio(const SAMPLE* frame, int* enc_ret);
-  virtual void			decodeAudio(const unsignedchar* data, SAMPLE* out, int enc_ret);
-}
+  virtual void			decodeAudio(const unsigned char* data, SAMPLE* out, int enc_ret);
+};
