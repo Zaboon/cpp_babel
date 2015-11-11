@@ -8,15 +8,17 @@ SRC_SERV	=	babel_test_server.cpp	\
 				../ISocket.cpp			\
 				../Packet.cpp			\
 				../Rsa.cpp				\
-				../BBException.cpp
+				../BBException.cpp		\
+				../BabelServer.cpp
 
-SRC_CLIENT	=	babel_test_server.cpp	\
+SRC_CLIENT	=	babel_test_client.cpp	\
 				LinuxSocket.cpp			\
 				../MutexVault.cpp		\
 				../ISocket.cpp			\
 				../Packet.cpp			\
 				../Rsa.cpp				\
-				../BBException.cpp
+				../BBException.cpp		\
+				../BabelClient.cpp
 
 OBJ_SERV	=	$(SRC_SERV:.cpp=.o)
 
@@ -26,7 +28,7 @@ NAME_S		=	server
 
 NAME_C		=	client
 
-LIBS		=	-L. -lopus -lrt -lasound -ljack -lpthread -lm -lportaudio -lcrypto -lssl
+LIBS		=	-L. -lpthread -lcrypto -lssl -g3
 
 all	:	$(NAME_S) $(NAME_C)
 

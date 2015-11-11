@@ -12,12 +12,13 @@ int     main(int ac, char **av)
 {
     int port;
 
-    if (ac != 2)
+    if (ac != 3)
         return (-1);
-    std::istringstream(av[1]) >> port;
+    std::istringstream(av[2]) >> port;
+    std::string ip = av[1];
 
     try {
-        ISocket *server = ISocket::getServer(port);
+        ISocket *server = ISocket::getClient(ip, port);
         BabelClient *cl = BabelClient::getInstance();
 
         server->attachOnConnect(BabelClient::onConnect);
@@ -33,7 +34,6 @@ int     main(int ac, char **av)
             server->writePacket(Packet::pack<std::string>(s));
         }
         server->cancel();
-        BabelServer::getInstance(true);
         sleep(1);
         delete server;
         delete cl;

@@ -15,7 +15,7 @@ BabelClient::getInstance()
 }
 
 std::vector<Identity>
-BabelClient::getClients()
+BabelClient::getContacts()
 {
     IMutex *mutex = (*MutexVault::getMutexVault())["contacts"];
     std::vector<Identity> contacts;
@@ -93,7 +93,7 @@ BabelClient::executeIdentity(Identity *id, ISocket *client)
                 client->writePacket(new Packet(ENDCALL));
             mutex->unlock();
     }
-    delete ip;
+    delete id;
     return;
 }
 
@@ -131,14 +131,15 @@ BabelClient::onConnect(ISocket *client)
 void
 BabelClient::onDisconnect(ISocket *client)
 {
+    BabelClient *_this = BabelClient::getInstance();
+
     IMutex *mutex = (*MutexVault::getMutexVault())["peer"];
     mutex->lock(true);
-    if (client->_peer) {
-        client->_peer->cancel();
-        delete client->_peer;
-        client->_peer = NULL;
+    if (_this->_peer != NULL) {
+        _this->_peer->cancel();
+        delete _this->_peer;
+        _this->_peer = NULL;
     }
-
     mutex->unlock();
     std::cout << "Server on " << client->getIp() << " for client no : " << client->getId() << " disconnected!" << std::endl;
 }
@@ -147,7 +148,6 @@ void
 BabelClient::onReceive(ISocket *client)
 {
     Packet  *packet;
-    bool    res = true;
 
     //get packet
     if ((packet = client->readPacket(0)) != NULL) {
@@ -156,8 +156,6 @@ BabelClient::onReceive(ISocket *client)
         if ((rsa = client->getSendRsa()) == NULL) {
             if (!packet->isEncrypted() && packet->getType() == Packet::SSLPublicKey)
                 client->attachRsa(packet->unpack<Rsa>());
-            else
-                res = false;
         }
         else if (packet->isEncrypted()) {
 
@@ -165,8 +163,6 @@ BabelClient::onReceive(ISocket *client)
                 BabelClient::executeIdentity(packet->unpack<Identity>(rsa), client);
             else if (packet->getType() == Packet::Inst)
                 BabelClient::executeInstruction(packet->unpack<Instruct>(rsa), client);
-            else
-                res = false;
         }
         else if (packet->getType() == Packet::String) {
 
@@ -175,20 +171,8 @@ BabelClient::onReceive(ISocket *client)
             std::cout << *msg << std::endl;
             delete msg;
         }
-        else
-            res = false;
 
         delete packet;
-    }
-    else
-        res = false;
-
-    if (!res) {
-
-        if (++BabelServer::getInstance()->_tries[client] >= TRY_LIMIT)
-            client->cancel();
-        else
-            BabelServer::getInstance()->_tries[client] = 0;
     }
 }
 

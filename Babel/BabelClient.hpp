@@ -15,11 +15,11 @@
 class BabelClient {
 
 public:
-    BabelClient *getInstance();
+    static BabelClient *getInstance();
 
     ~BabelClient()
     {
-        for (unsigned int i = 0; i < this->_contacts; i++)
+        for (unsigned int i = 0; i < this->_contacts.size(); i++)
         {
             if (this->_contacts[i] != NULL)
                 delete this->_contacts[i];
@@ -28,7 +28,7 @@ public:
             delete this->_peer;
     }
 
-    std::vector<Identity *> getContacts;
+    std::vector<Identity> getContacts();
 
     void addContact(Identity *id);
     void removeContact(Identity *id);
@@ -45,7 +45,7 @@ public:
 
 private:
 
-    BabelClient() : asked_call(false) {};
+    BabelClient() : asked_call(false), _peer(NULL) {};
 
     bool asked_call;
     Instruct *latest_cmd;
