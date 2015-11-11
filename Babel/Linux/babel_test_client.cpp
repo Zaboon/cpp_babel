@@ -6,7 +6,7 @@
 #include "../ISocket.h"
 #include "../Rsa.h"
 #include "LinuxSocket.h"
-#include "../BabelServer.hpp"
+#include "../BabelClient.hpp"
 
 int     main(int ac, char **av)
 {
@@ -18,10 +18,11 @@ int     main(int ac, char **av)
 
     try {
         ISocket *server = ISocket::getServer(port);
+        BabelClient *cl = BabelClient::getInstance();
 
-        server->attachOnConnect(BabelServer::onConnect);
-        server->attachOnReceive(BabelServer::onReceive);
-        server->attachOnDisconnect(BabelServer::onDisconnect);
+        server->attachOnConnect(BabelClient::onConnect);
+        server->attachOnReceive(BabelClient::onReceive);
+        server->attachOnDisconnect(BabelClient::onDisconnect);
 
         server->start();
         std::cout << "Server up and ready on " << server->getIp() << " port " << server->getPort() << " status " << server->getStatus() << std::endl;
@@ -32,7 +33,10 @@ int     main(int ac, char **av)
             server->writePacket(Packet::pack<std::string>(s));
         }
         server->cancel();
+        BabelServer::getInstance(true);
         sleep(1);
+        delete server;
+        delete cl;
     }
     catch (const char *e) {
         std::cout << e << std::endl;
