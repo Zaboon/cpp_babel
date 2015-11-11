@@ -38,6 +38,7 @@ BabelServer::deleteProfile(Profile *to_delete)
             this->_people[i] = NULL;
             break;
         }
+    mutex->unlock();
     return;
 }
 
@@ -186,30 +187,26 @@ BabelServer::executeIdentity(Identity *identity, ISocket *client)
 
     if (identity == NULL)
         return;
+    std::cout << "Recv identity " << identity << std::endl;
+    std::cout << CONNECTION << " " << identity->getInstruct() << std::endl;
     mutex->lock(true);
-    if ((client_profile = server->getByClient(client)) != NULL)
-        switch (identity->getInstruct())
-        {
-            case (CONNECTION) :
-                if (identity->hasAdressAndName() &&
-                    server->getByUsername(identity->getUsername()) == NULL)
-                {
-                    server->_people.push_back(new Profile(client_profile->first, identity));
-                    Identity id(identity->getUsername(), ADDCONTACT);
-                    server->sendPacketToAllRegisteredUsers(new Packet(id), client_profile->first);
-                    client_profile->first->writePacket(new Packet(OK));
-                    //dont delete profile
-                    return;
-                }
-                else
-                    client_profile->first->writePacket(new Packet(KO));
-                break;
+    if ((client_profile = server->getByClient(client)) == NULL && identity->getInstruct() == CONNECTION &&
+            (identity->hasAdressAndName() && server->getByUsername(identity->getUsername()) == NULL))
+    {
+        server->_people.push_back(new Profile(client, identity));
+        Identity id(identity->getUsername(), ADDCONTACT);
+        server->sendPacketToAllRegisteredUsers(new Packet(id), client);
+        client->writePacket(new Packet(OK));
+        std::cout << "username : " << identity->getUsername() << std::endl;
+    }
+    else {
+        std::cout << "NOT NULL" << std::endl;
+        switch (identity->getInstruct()) {
             case (ASKCALL) :
                 if (identity->hasName() &&
                     (peer_profile = server->getByUsername(identity->getUsername())) != NULL &&
                     peer_profile != client_profile &&
-                    (client_profile->second->getPeer() == NULL && peer_profile->second->getPeer() == NULL))
-                {
+                    (client_profile->second->getPeer() == NULL && peer_profile->second->getPeer() == NULL)) {
                     client_profile->second->setPeer(peer_profile->second);
                     peer_profile->second->setPeer(client_profile->second);
 
@@ -222,7 +219,8 @@ BabelServer::executeIdentity(Identity *identity, ISocket *client)
                     client->writePacket(new Packet(KO));
                 break;
         }
-    delete identity;
+        delete identity;
+    }
     mutex->unlock();
     return;
 }
@@ -239,30 +237,33 @@ BabelServer::onReceive(ISocket *client)
         Rsa *rsa;
         std::string *msg;
         if ((rsa = client->getSendRsa()) == NULL) {
-            if (!packet->isEncrypted() && packet->getType() == Packet::SSLPublicKey)
-                client->attachRsa(packet->unpack<Rsa>());
+            if (packet->getType() == Packet::SSLPublicKey) {
+                if (packet->isEncrypted())
+                    client->attachRsa(packet->unpack<Rsa>(client->getRecvRsa()));
+                else
+                    client->attachRsa(packet->unpack<Rsa>());
+                std::cout << "Ok for public key" << std::endl;
+            }
             else
                 res = false;
         }
-        else if (packet->isEncrypted()) {
+        else {
 
             if (packet->getType() == Packet::Id)
                 BabelServer::executeIdentity(packet->unpack<Identity>(rsa), client);
             else if (packet->getType() == Packet::Inst)
                 BabelServer::executeInstruction(packet->unpack<Instruct>(rsa), client);
+            else if (packet->getType() == Packet::String) {
+
+                msg = packet->unpack<std::string>(rsa);
+                std::cout << "Received message from " << client->getIp() << " for client no : " << client->getId() <<
+                " (msg_length : " << msg->size() << ") : ";
+                std::cout << *msg << std::endl;
+                delete msg;
+            }
             else
                 res = false;
         }
-        else if (packet->getType() == Packet::String) {
-
-            msg = packet->unpack<std::string>(rsa);
-            std::cout << "Received message from " << client->getIp() << " for client no : " << client->getId() <<
-            " (msg_length : " << msg->size() << ") : ";
-            std::cout << *msg << std::endl;
-            delete msg;
-        }
-        else
-            res = false;
 
         delete packet;
     }

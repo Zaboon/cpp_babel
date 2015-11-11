@@ -20,14 +20,18 @@ public:
 
     ~BabelServer()
     {
+        IMutex *mutex = (*MutexVault::getMutexVault())["people"];
+
+        mutex->lock(true);
         for (unsigned int i = 0; i < this->_people.size(); i++)
         {
             if (this->_people[i] != NULL) {
-                delete this->_people[i]->first;
+                //delete this->_people[i]->first;
                 delete this->_people[i]->second;
                 delete this->_people[i];
             }
         }
+        mutex->unlock();
     }
 
     typedef std::pair<ISocket *, Identity *> Profile;

@@ -105,7 +105,7 @@ Packet::fromStream(std::vector<unsigned char> &data, Rsa* rsa)
     Packet *newPacket = new Packet;
     std::vector<unsigned char> new_data;
     newPacket->_type = *r_type;
-    newPacket->_encrypted = (*r_encrypted == 1);
+    newPacket->_encrypted = (*r_encrypted != 0);
     for (unsigned int i = 0; i < *r_size; i++)
         newPacket->_data.push_back(data[i + headerSize]);
     //consume flux
@@ -139,7 +139,7 @@ Packet::build(Rsa *rsa)
 
     //allocate
     std::vector<unsigned char> *build = new std::vector<unsigned char>(Packet::getHeaderSize());
-    for (unsigned int i = 0; i < Packet::getHeaderSize() / 4; i++) {
+    for (unsigned int i = 0; i < 4; i++) {
 
         //magic goes first
         (*build)[i] = magic_ptr[i];

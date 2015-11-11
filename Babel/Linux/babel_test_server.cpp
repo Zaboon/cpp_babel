@@ -35,8 +35,8 @@ int     main(int ac, char **av)
         server->cancel();
         BabelServer::getInstance(true);
         sleep(1);
-        delete server;
-        delete serv;
+        //delete server;
+        //delete serv;
     }
     catch (const char *e) {
         std::cout << e << std::endl;

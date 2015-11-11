@@ -154,8 +154,15 @@ BabelClient::onReceive(ISocket *client)
         //but first, let me take a RSA
         Rsa *rsa;
         if ((rsa = client->getSendRsa()) == NULL) {
-            if (!packet->isEncrypted() && packet->getType() == Packet::SSLPublicKey)
-                client->attachRsa(packet->unpack<Rsa>());
+            if (packet->getType() == Packet::SSLPublicKey) {
+                if (packet->isEncrypted())
+                    client->attachRsa(packet->unpack<Rsa>(client->getRecvRsa()));
+                else
+                    client->attachRsa(packet->unpack<Rsa>());
+                std::cout << "Ok for public key" << std::endl;
+                Identity i("pipi", "127.0.0.1", 4242, CONNECTION);
+                client->writePacket(new Packet(i));
+            }
         }
         else if (packet->isEncrypted()) {
 
