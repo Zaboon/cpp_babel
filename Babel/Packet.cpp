@@ -81,10 +81,11 @@ Packet::Packet(SoundPacket &p) : _type(Packet::Sound)
     unsigned char *ptr;
 
     ptr = reinterpret_cast<unsigned char *>(&(p.retenc));
-    for (unsigned int i = 0; i < sizeof(int); i++)
+    for (unsigned int i = 0; i < sizeof(p.retenc); i++)
         this->_data.push_back(ptr[i]);
-    for (unsigned int i = 0; i < FRAMES_PER_BUFFER; i++)
-        this->_data.push_back(ptr[i]);
+    for (unsigned int i = 0; i < 480; i++)
+        this->_data.push_back(p.data[i]);
+    this->_encrypted = false;
 }
 
 //static
@@ -103,16 +104,27 @@ Packet *
 Packet::fromStream(std::vector<unsigned char> &data, Rsa* rsa)
 {
     unsigned int headerSize = Packet::getHeaderSize();
-    if (data.size() <= headerSize)
-        return (NULL);
+    if (data.size() <= headerSize) {
 
+        std::cout << "plus haut" << std::endl;
+        return (NULL);
+    }
     unsigned int *r_magic = reinterpret_cast<unsigned int *>(&data[0]);
     Packet::Type *r_type = reinterpret_cast<Packet::Type *>(&data[sizeof(unsigned int)]);
     unsigned int *r_size = reinterpret_cast<unsigned int *>(&data[sizeof(unsigned int) * 2]);
     unsigned int *r_encrypted = reinterpret_cast<unsigned int *>(&data[sizeof(unsigned int) * 3]);
 
-    if (*r_magic != _MAGIC_ || *r_size + headerSize < data.size() || !(*r_encrypted == 0 || *r_encrypted == 1))
+    if (*r_magic != _MAGIC_ || *r_size + headerSize > data.size() || !(*r_encrypted == 0 || *r_encrypted == 1))
+    {
+        std::cout << (int)(*r_size) << std::cout;
+        if (*r_magic != _MAGIC_)
+            std::cout << "magic" << std::endl;
+        if (*r_size + headerSize < data.size())
+            std::cout << "size" << std::endl;
+        if (!(*r_encrypted == 0 || *r_encrypted == 1))
+            std::cout << "encr" << std::endl;
         return (NULL);
+    }
     Packet *newPacket = new Packet;
     std::vector<unsigned char> new_data;
     newPacket->_type = *r_type;
@@ -288,6 +300,7 @@ Packet::getSound()
     SoundPacket *sound = new SoundPacket;
     unsigned char *ptr;
 
+    sound->data = new unsigned char[480]();
     ptr = reinterpret_cast<unsigned char *>(&(sound->retenc));
     for (unsigned int i = 0; i < sizeof(int); i++)
         (*ptr) = this->_data[i];
