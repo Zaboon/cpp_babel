@@ -39,13 +39,14 @@ public:
     QString getUsername() const;
     QString getRingtone() const;
     bool getRaise() const;
+    void addContact(std::string&);
+    void removeContact(const std::string&);
     ~Home();
 
 private:
     Ui::Home    *ui;
     bool        isRaise;
     QString     username;
-    QStringList _list;
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     int m_nMouseClick_X_Coordinate;

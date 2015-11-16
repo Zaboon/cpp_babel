@@ -14,16 +14,12 @@ incomingCall::incomingCall(QString &str, QString &usr, QWidget *parent) :
     this->player = new QMediaPlayer;
     this->playlist = new QMediaPlaylist(this->player);
     if ((this->fileName = this->home->getRingtone()).isEmpty())
-    {
-        std::cout << "mpm" << std::endl;
         this->fileName = "./sounds/ringing.mp3";
-    }
     this->playlist->addMedia(QUrl::fromLocalFile(this->fileName));
     this->playlist->setPlaybackMode(QMediaPlaylist::Loop);
     this->player->setPlaylist(this->playlist);
     this->player->setVolume(100);
     this->player->play();
-    std::cout << this->fileName.toStdString() << std::endl;
     ui->name->setText("Incoming call from " + this->name);
     ui->answerButton->setIcon(QIcon("./images/answer.png"));
     ui->hangupButton->setIcon(QIcon("./images/hang_up.png"));

@@ -109,8 +109,6 @@ void    Connect::getInfos()
         this->ui->ipAddress->clear();
         return;
     }
-    std::cout << "Username:" << this->username.toStdString() << "." << std::endl;
-    std::cout << "IP Address:" << this->ipAddress.toStdString() << "." << std::endl;
     this->_home = Home::getHome(this->username);
     this->_home->show();
     this->close();

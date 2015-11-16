@@ -7,8 +7,7 @@ Home::Home(QString &str, QWidget *parent) :
 {
     ui->setupUi(this);
     this->username = str;
-    this->_list << "lol" << "bite" << "teub";
-    this->ui->listFriends->addItems(this->_list);
+
     this->isRaise = false;
     this->setAttribute(Qt::WA_TranslucentBackground, true);
     this->activateWindow();
@@ -68,6 +67,24 @@ QString     Home::getRingtone() const
 bool            Home::getRaise() const
 {
     return this->isRaise;
+}
+
+void             Home::addContact(std::string& username)
+{
+    this->ui->listFriends->addItem(QString::fromStdString(username));
+}
+
+void             Home::removeContact(const std::string& username)
+{
+    for (int i = 0; i < this->ui->listFriends->count(); i++)
+    {
+        QListWidgetItem *elem = this->ui->listFriends->item(i);
+        if (elem->text().toStdString() == username)
+        {
+            this->ui->listFriends->removeItemWidget(elem);
+            return;
+        }
+    }
 }
 
 //SLOTS

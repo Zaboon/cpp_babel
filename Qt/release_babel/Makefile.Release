@@ -1330,30 +1330,7 @@ release/start.o: ../Babel/start.cpp ../Babel/start.h \
 		N:/Qt/5.5/mingw492_32/include/QtMultimedia/qmediaplayer.h \
 		N:/Qt/5.5/mingw492_32/include/QtNetwork/qnetworkconfiguration.h \
 		../Babel/calling.h \
-		ui_start.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QAction \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qaction.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qactiongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QApplication \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qcoreapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qeventloop.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qguiapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qinputmethod.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QButtonGroup \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qbuttongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHBoxLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qboxlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayoutitem.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qgridlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHeaderView \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qheaderview.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QLabel \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlabel.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QSpacerItem \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QVBoxLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QWidget
+		ui_start.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\start.o ..\Babel\start.cpp
 
 release/connect.o: ../Babel/connect.cpp ../Babel/connect.h \
@@ -1523,36 +1500,7 @@ release/connect.o: ../Babel/connect.cpp ../Babel/connect.h \
 		N:/Qt/5.5/mingw492_32/include/QtMultimedia/qmediaplayer.h \
 		N:/Qt/5.5/mingw492_32/include/QtNetwork/qnetworkconfiguration.h \
 		../Babel/calling.h \
-		ui_connect.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QAction \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qaction.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qactiongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QApplication \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qcoreapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qeventloop.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qguiapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qinputmethod.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QButtonGroup \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qbuttongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QGridLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qgridlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayoutitem.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qboxlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHBoxLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHeaderView \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qheaderview.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QLabel \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlabel.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QLineEdit \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlineedit.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qtextcursor.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qtextformat.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qpen.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qtextoption.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QSpacerItem \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QWidget
+		ui_connect.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\connect.o ..\Babel\connect.cpp
 
 release/home.o: ../Babel/home.cpp ../Babel/home.h \
@@ -1713,34 +1661,7 @@ release/home.o: ../Babel/home.cpp ../Babel/home.h \
 		N:/Qt/5.5/mingw492_32/include/QtMultimedia/qmediaplayer.h \
 		N:/Qt/5.5/mingw492_32/include/QtNetwork/qnetworkconfiguration.h \
 		../Babel/calling.h \
-		ui_home.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QAction \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qaction.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qactiongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QApplication \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qcoreapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qeventloop.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qguiapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qinputmethod.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QButtonGroup \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qbuttongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QGridLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qgridlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayoutitem.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qboxlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHBoxLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHeaderView \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qheaderview.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QLabel \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlabel.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QListWidget \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QPushButton \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qpushbutton.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qabstractbutton.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QSpacerItem \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QWidget
+		ui_home.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\home.o ..\Babel\home.cpp
 
 release/incomingcall.o: ../Babel/incomingcall.cpp N:/Qt/5.5/mingw492_32/include/QtGui/QMouseEvent \
@@ -1902,33 +1823,7 @@ release/incomingcall.o: ../Babel/incomingcall.cpp N:/Qt/5.5/mingw492_32/include/
 		N:/Qt/5.5/mingw492_32/include/QtWidgets/QScrollBar \
 		N:/Qt/5.5/mingw492_32/include/QtWidgets/qscrollbar.h \
 		../Babel/calling.h \
-		ui_incomingcall.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QAction \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qaction.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qactiongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QApplication \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qcoreapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qeventloop.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qguiapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qinputmethod.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QButtonGroup \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qbuttongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QGridLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qgridlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayoutitem.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qboxlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHBoxLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHeaderView \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qheaderview.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QLabel \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlabel.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QPushButton \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qpushbutton.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qabstractbutton.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QSpacerItem \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QWidget
+		ui_incomingcall.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\incomingcall.o ..\Babel\incomingcall.cpp
 
 release/calling.o: ../Babel/calling.cpp N:/Qt/5.5/mingw492_32/include/QtGui/QMouseEvent \
@@ -2089,33 +1984,7 @@ release/calling.o: ../Babel/calling.cpp N:/Qt/5.5/mingw492_32/include/QtGui/QMou
 		N:/Qt/5.5/mingw492_32/include/QtWidgets/QScrollBar \
 		N:/Qt/5.5/mingw492_32/include/QtWidgets/qscrollbar.h \
 		../Babel/incomingcall.h \
-		ui_calling.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QAction \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qaction.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qactiongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QApplication \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qcoreapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtCore/qeventloop.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qguiapplication.h \
-		N:/Qt/5.5/mingw492_32/include/QtGui/qinputmethod.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QButtonGroup \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qbuttongroup.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QGridLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qgridlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlayoutitem.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qboxlayout.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHBoxLayout \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QHeaderView \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qheaderview.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QLabel \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qlabel.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QPushButton \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qpushbutton.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/qabstractbutton.h \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QSpacerItem \
-		N:/Qt/5.5/mingw492_32/include/QtWidgets/QWidget
+		ui_calling.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\calling.o ..\Babel\calling.cpp
 
 release/moc_start.o: release/moc_start.cpp 
