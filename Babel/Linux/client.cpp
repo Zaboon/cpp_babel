@@ -18,29 +18,23 @@ void testOnDisconnect(ISocket *client)
 
 void testOnReceive(ISocket *client)
 {
-    std::vector<unsigned char> tmp;
     Packet *p;
 
-    tmp = client->read(0);
+    if ((p = client->readPacket(0)) == NULL)
+        return;
     if (client->getSendRsa() == 0) {
-        if ((p = Packet::fromStream(tmp)) == NULL) {
-            std::cout << "nope!" << std::endl;
-            return;
-        }
-        else {
-
-            Rsa *r;
-            if (p->getType() == Packet::SSLPublicKey && (r = p->unpack<Rsa>()) != NULL) {
-                client->attachRsa(r);
-                std::cout << "ok for public key!" << std::endl;
-            }
+        Rsa *r;
+        if (p->getType() == Packet::SSLPublicKey && (r = p->unpack<Rsa>()) != NULL) {
+            client->attachRsa(r);
+            std::cout << "ok for public key!" << std::endl;
         }
     }
-    else {
+    else if (p->getType() == Packet::String) {
+
+        std::string *s = p->unpack<std::string>();
         std::cout << "Received message from " << client->getIp() << " for client no : " << client->getId() <<
-        " (msg_length : " << tmp.size() << ") : ";
-        for (unsigned int i = 0; i < tmp.size(); i++)
-            std::cout << static_cast<char>(tmp[i]);
+        " (msg_length : " << s->size() << ") : ";
+        std::cout << *s << std::endl;
     }
     std::cout << std::endl;
 }
@@ -49,12 +43,7 @@ void testOnConnect(ISocket *client)
 {
     //send him my RSA
     Packet *p = new Packet(*(client->getRecvRsa()));
-    p->build();
-    std::vector<unsigned char> *pack = p->build();
-    for (unsigned int i = 0; i < client->getRecvRsa()->getPublicKey().size(); i++)
-        std::cout << client->getRecvRsa()->getPublicKey()[i];
-    client->write(*pack);
-    delete pack;
+    client->writePacket(p);
     std::cout << "Server on " << client->getIp() << " for client no : " << client->getId() << " accepted connection!" << std::endl;
 }
 
@@ -80,11 +69,7 @@ int main(int ac, char **av)
         std::string s;
         while (s != "quit") {
             std::getline(std::cin, s);
-            packet.clear();
-            for (unsigned int i = 0; i < s.size(); i++)
-                packet.push_back(static_cast<unsigned char>(s[i]));
-            packet.push_back(static_cast<unsigned char>('\n'));
-            client->write(packet);
+            client->writePacket(Packet::pack<std::string>(s));
         }
         client->cancel();
         sleep(1);

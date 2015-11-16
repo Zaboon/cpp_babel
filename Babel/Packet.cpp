@@ -7,6 +7,48 @@ Packet::Packet()
     this->_encrypted = false;
 }
 
+Packet::Packet(Instruct instruction) : _type(Packet::Inst)
+{
+    unsigned char *instr;
+
+    instr = reinterpret_cast<unsigned char *>(&instruction);
+
+    for (unsigned int i = 0; i < sizeof(instr); i++)
+        this->_data.push_back(instr[i]);
+    this->_encrypted = false;
+}
+
+Packet::Packet(Identity& id) : _type(Packet::Id)
+{
+    unsigned char *instr;
+    unsigned char *port;
+    char* _username;
+    char* _ip;
+    unsigned int _instruction;
+    unsigned int _port;
+
+    _instruction = id.getInstruct();
+    _port = id.getPort();
+    _username = id.getUsername();
+    _ip = id.getIp();
+    instr = reinterpret_cast<unsigned char *>(&_instruction);
+    port = reinterpret_cast<unsigned char *>(&_port);
+
+    for (unsigned int i = 0; i < 8; ++i)
+        if (i < 4)
+            _data.push_back(instr[i]);
+        else
+            _data.push_back(port[i - sizeof(int)]);
+
+    for (unsigned int i = 0; i < 64; ++i)
+        _data.push_back(_username[i]);
+
+    for (unsigned int i = 0; i < 32; ++i)
+        _data.push_back(_ip[i]);
+
+    this->_encrypted = false;
+}
+
 //pbject specific constructors
 Packet::Packet(std::string &str) : _type(Packet::String)
 {
@@ -34,6 +76,17 @@ Packet::Packet(Rsa &rsa) : _type(Packet::SSLPublicKey)
     this->_encrypted = false;
 }
 
+Packet::Packet(SoundPacket &p) : _type(Packet::Sound)
+{
+    unsigned char *ptr;
+
+    ptr = reinterpret_cast<unsigned char *>(&(p.retenc));
+    for (unsigned int i = 0; i < sizeof(int); i++)
+        this->_data.push_back(ptr[i]);
+    for (unsigned int i = 0; i < FRAMES_PER_BUFFER; i++)
+        this->_data.push_back(ptr[i]);
+}
+
 //static
 unsigned int
 Packet::getHeaderSize()
@@ -47,7 +100,7 @@ Packet::getHeaderSize()
 
 //get packet from bytestream (bytestream is then consumed)
 Packet *
-Packet::fromStream(std::vector<unsigned char> &data)
+Packet::fromStream(std::vector<unsigned char> &data, Rsa* rsa)
 {
     unsigned int headerSize = Packet::getHeaderSize();
     if (data.size() <= headerSize)
@@ -63,11 +116,17 @@ Packet::fromStream(std::vector<unsigned char> &data)
     Packet *newPacket = new Packet;
     std::vector<unsigned char> new_data;
     newPacket->_type = *r_type;
-    newPacket->_encrypted = (*r_encrypted == 1);
+    newPacket->_encrypted = (*r_encrypted != 0);
     for (unsigned int i = 0; i < *r_size; i++)
         newPacket->_data.push_back(data[i + headerSize]);
     //consume flux
     data.erase(data.begin(), data.begin() + headerSize + *r_size);
+    if (rsa != NULL && newPacket->_encrypted)
+    {
+        newPacket->_data = rsa->decrypt(newPacket->_data);
+        newPacket->_encrypted = false;
+    }
+
     return (newPacket);
 }
 
@@ -91,7 +150,7 @@ Packet::build(Rsa *rsa)
 
     //allocate
     std::vector<unsigned char> *build = new std::vector<unsigned char>(Packet::getHeaderSize());
-    for (unsigned int i = 0; i < Packet::getHeaderSize() / 4; i++) {
+    for (unsigned int i = 0; i < 4; i++) {
 
         //magic goes first
         (*build)[i] = magic_ptr[i];
@@ -116,8 +175,8 @@ Packet::build(Rsa *rsa)
     return (build);
 }
 
-std::vector<unsigned char> const &
-Packet::getData() const
+std::vector<unsigned char>&
+Packet::getData()
 {
     return (this->_data);
 }
@@ -170,7 +229,7 @@ Packet::getIntVector()
 Rsa *
 Packet::getRsa()
 {
-    Rsa *result;
+    Rsa *result = NULL;
 
     if (this->_type == Packet::SSLPublicKey)
     {
@@ -184,4 +243,55 @@ Packet::getRsa()
         }
     }
     return (result);
+}
+
+Identity*
+Packet::getIdentity()
+{
+    Instruct             *_instruction;
+    unsigned int         *_port;
+    char        _username[64];
+    char        _ip[32];
+
+    if (this->_type != Packet::Id)
+        return (NULL);
+    _instruction = reinterpret_cast<Instruct *>(&_data[0]);
+    _port = reinterpret_cast<unsigned int *>(&_data[4]);
+    for (unsigned int i = 0; i < sizeof(_username); i++)
+    {
+        _username[i] = _data[i + sizeof(Instruct) + sizeof(unsigned int)];
+        if (i < 32)
+            _ip[i] = _data[i + sizeof(_username) + sizeof(Instruct) + sizeof(unsigned int)];
+    }
+    Identity *id = new Identity(_username, _ip, *_port, *_instruction);
+    return (id);
+}
+
+Instruct*
+Packet::getInstruction()
+{
+    Instruct            *_instruction;
+    unsigned char       *ptr;
+
+    if (this->_type != Packet::Inst)
+        return (NULL);
+    _instruction = new Instruct;
+    ptr = reinterpret_cast<unsigned char *>(_instruction);
+    for (unsigned int i = 0; i < sizeof(Instruct); i++)
+        ptr[i] = this->_data[i];
+    return (_instruction);
+}
+
+SoundPacket*
+Packet::getSound()
+{
+    SoundPacket *sound = new SoundPacket;
+    unsigned char *ptr;
+
+    ptr = reinterpret_cast<unsigned char *>(&(sound->retenc));
+    for (unsigned int i = 0; i < sizeof(int); i++)
+        (*ptr) = this->_data[i];
+    for (unsigned int i = sizeof(int); i < FRAMES_PER_BUFFER + sizeof(int); i++)
+        sound->data[i - sizeof(int)] = this->_data[i];
+    return (sound);
 }

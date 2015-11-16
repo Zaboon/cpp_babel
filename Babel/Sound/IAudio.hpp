@@ -1,10 +1,18 @@
-#pragma once
+#ifndef	__IAUDIO__
+#define __IAUDIO__
 
 #include <iostream>
 #include <fstream>
 #include <iterator>
 #include <utility>
+#include <cstring>
 #include "IEncode.hpp"
+
+struct SoundPacket
+{
+    int                         retenc;
+    unsigned char               data[FRAMES_PER_BUFFER];
+};
 
 class	        IAudio
 {
@@ -20,7 +28,10 @@ public:
   virtual int	stopStream() = 0;
   virtual IEncode*	getEnc() = 0;
   virtual void	setData(unsigned char *) = 0;
-  virtual const int	getRetenc() const = 0;
+  virtual unsigned char *getBuffer() const = 0;
+  virtual int	getRetenc() const = 0;
   virtual void	setRetenc(int) = 0;
-  virtual const std::pair<const unsigned char *, const int>	getData() const = 0;
+  virtual SoundPacket*	getData() const = 0;
 };
+
+#endif /* __IAUDUI__ */

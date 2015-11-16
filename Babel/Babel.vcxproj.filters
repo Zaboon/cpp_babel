@@ -45,9 +45,6 @@
     <ClInclude Include="Windows\WinThread.hpp">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Windows\WinSocket.hpp">
-      <Filter>Header Files\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="Linux\LinuxMutex.hpp">
       <Filter>Header Files\Linux</Filter>
     </ClInclude>
@@ -59,6 +56,9 @@
     </ClInclude>
     <ClInclude Include="Contact.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\WinSocket.h">
+      <Filter>Header Files\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="Linux\LinuxSocket.cpp">
       <Filter>Header Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\WinSocket.cpp">
+      <Filter>Header Files\Windows</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

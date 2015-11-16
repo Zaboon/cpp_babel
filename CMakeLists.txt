@@ -12,6 +12,6 @@ set(SOURCE_FILES
     Project2/IThread.hpp
     Project2/MutexVault.hpp Project2/Packet.h
     Project2/Linux/LinuxSocket.cpp
-    Project2/Linux/LinuxSocket.h Project2/MutexVault.cpp.cpp Project2/MutexVault.cpp.h)
+    Project2/Linux/LinuxSocket.h Project2/MutexVault.cpp.cpp Project2/MutexVault.cpp.h Babel/BabelServer.cpp Babel/BabelServer.hpp BabelClient.cpp BabelClient.hpp Babel/BabelClient.hpp Babel/BabelClient.cpp Babel/BabelClient.hpp)
 
 add_executable(cpp_babel ${SOURCE_FILES})

@@ -12,6 +12,7 @@
 #include <vector>
 #include "MutexVault.hpp"
 #include "Rsa.h"
+#include "Packet.h"
 
 class ISocket
 {
@@ -56,7 +57,11 @@ public:
 
 	std::vector<unsigned char> read(unsigned int bytes);
 
+	Packet *readPacket(unsigned int bytes);
+
 	void write(const std::vector<unsigned char> &data, unsigned int id = 0);
+
+	void writePacket(Packet *packet, unsigned int id = 0, bool del = true);
 
 	std::vector<unsigned char> operator<<(ISocket *client);
 
@@ -92,6 +97,8 @@ public:
 
 	Rsa *getRecvRsa() const;
 
+	void setMustEncrypt(bool value);
+
 protected:
 
 
@@ -112,6 +119,7 @@ protected:
 
 	Rsa 					*_sendRsa;
 	Rsa 					*_recvRsa;
+	bool 					_mustEncrypt;
 };
 
 #endif /* !ISOCKET_H_ */

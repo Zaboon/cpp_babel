@@ -1,4 +1,5 @@
-#pragma once
+#ifndef	__SOUNDMANAGER__
+#define __SOUNDMANAGER__
 
 #include "IAudio.hpp"
 #include "EncodeManager.hpp"
@@ -31,8 +32,11 @@ public:
   virtual int		startStream();
   virtual int		stopStream();
   virtual IEncode*	getEnc();
-  virtual const std::pair<const unsigned char *, const int> getData() const;
+  virtual SoundPacket*	getData() const;
   virtual void		setData(unsigned char *);
-  virtual const int	getRetenc() const;
+  virtual unsigned char*getBuffer() const;
+  virtual int	getRetenc() const;
   virtual void		setRetenc(int);
 };
+
+#endif /* __SOUNMANAGER__ */

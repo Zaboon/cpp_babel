@@ -143,12 +143,7 @@
     <ClInclude Include="MutexVault.hpp" />
     <ClInclude Include="Windows\WinCriticalSession.hpp" />
     <ClInclude Include="Windows\WinMutex.hpp" />
-    <ClInclude Include="Windows\WinSocket.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="Windows\WinSocket.h" />
     <ClInclude Include="Windows\WinThread.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +160,7 @@
     <ClCompile Include="MutexVault.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="BBException.cpp" />
+    <ClCompile Include="Windows\WinSocket.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
