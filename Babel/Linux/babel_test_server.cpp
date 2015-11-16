@@ -30,7 +30,11 @@ int     main(int ac, char **av)
         std::string s;
         while (s != "quit") {
             std::getline(std::cin, s);
-            server->writePacket(Packet::pack<std::string>(s));
+
+            if (s == "users")
+                serv->showConnectedUsers();
+            else
+                server->writePacket(Packet::pack<std::string>(s));
         }
         server->cancel();
         BabelServer::getInstance(true);

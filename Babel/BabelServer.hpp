@@ -38,6 +38,8 @@ public:
 
     static BabelServer *getInstance(bool del = false);
 
+    void    showConnectedUsers();
+
     void    deleteProfile(Profile *to_delete);
 
     Profile *getByUsername(char *username);

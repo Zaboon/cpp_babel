@@ -54,6 +54,34 @@ BabelClient::removeContact(Identity *id)
     mutex->unlock();
 }
 
+bool
+BabelClient::answer(ISocket *client)
+{
+    BabelClient *_this = BabelClient::getInstance();
+    IMutex *mutex = (*MutexVault::getMutexVault())["peer"];
+
+    mutex->lock(true);
+    if (_this->_peer != NULL && _this->_peer->getStatus() == ISocket::Ready)
+    {
+        //attach handlers
+        if (_this->_peer->start() == -1) {
+            std::cout << "Connection failed" << std::endl;
+            client->writePacket(new Packet(ENDCALL));
+            delete _this->_peer;
+            _this->_peer = NULL;
+        }
+        else
+        {
+            //send ok!
+            client->writePacket(new Packet(CALLESTABLISHED));
+            mutex->unlock();
+            return (true);
+        }
+    }
+    mutex->unlock();
+    return (false);
+}
+
 void
 BabelClient::executeIdentity(Identity *id, ISocket *client)
 {
@@ -65,32 +93,16 @@ BabelClient::executeIdentity(Identity *id, ISocket *client)
     switch (id->getInstruct())
     {
         case (ADDCONTACT) :
-            BabelClient::getInstance()->addContact(id);
+            _this->addContact(id);
             return; //no delete
         case (DELCONTACT) :
-            BabelClient::getInstance()->removeContact(id);
+            _this->removeContact(id);
             break;
         case (ASKCALL) :
             mutex = (*MutexVault::getMutexVault())["peer"];
             mutex->lock(true);
             if (id->hasAdressAndName() && _this->_peer == NULL)
-            {
                 _this->_peer = ISocket::getClient(id->getIp(), id->getPort());
-                if (_this->_peer->start() == -1) {
-                    std::cout << "Connection failed" << std::endl;
-                    client->writePacket(new Packet(ENDCALL));
-                    delete _this->_peer;
-                    _this->_peer = NULL;
-                }
-                else
-                {
-
-                    //attach handlers
-                    client->writePacket(new Packet(CALLESTABLISHED));
-                }
-            }
-            else
-                client->writePacket(new Packet(ENDCALL));
             mutex->unlock();
     }
     delete id;

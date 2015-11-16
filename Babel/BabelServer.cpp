@@ -42,6 +42,29 @@ BabelServer::deleteProfile(Profile *to_delete)
     return;
 }
 
+void
+BabelServer::showConnectedUsers()
+{
+    IMutex *mutex = (*MutexVault::getMutexVault())["people"];
+    unsigned int count = 0;
+
+    mutex->lock(true);
+    for (unsigned int i = 0; i < this->_people.size(); i++)
+        if (this->_people[i] != NULL)
+            count += 1;
+
+    if (count == 0)
+        std::cout << "No one is connected!" << std::endl;
+    else
+        std::cout << count << " people are connected!" << std::endl;
+
+    for (unsigned int i = 0; i < this->_people.size(); i++)
+        if (this->_people[i] != NULL)
+            std::cout << "On " << this->_people[i]->first->getIp() << ", username " << this->_people[i]->second->getUsername() << std::endl;
+    mutex->unlock();
+    return;
+}
+
 BabelServer::Profile *
 BabelServer::getByUsername(char *username)
 {

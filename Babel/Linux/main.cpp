@@ -67,7 +67,7 @@ int main(int ac, char **av)
 
         std::string s;
         while (s != "quit") {
-            std::getline(std::cin, s);
+            std::getline(std::cin, s);x
             server->writePacket(Packet::pack<std::string>(s));
         }
         server->cancel();

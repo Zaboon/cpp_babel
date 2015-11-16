@@ -33,6 +33,8 @@ public:
     void addContact(Identity *id);
     void removeContact(Identity *id);
 
+    static bool answer(ISocket *client);
+
     static void executeIdentity(Identity *, ISocket *client);
 
     static void executeInstruction(Instruct *, ISocket *client);
