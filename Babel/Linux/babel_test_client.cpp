@@ -10,18 +10,18 @@
 
 SoundManager	*getSound()
 {
-  static SoundManager *sound = NULL;
+    static SoundManager *sound = NULL;
 
-  if (sound == NULL)
+    if (sound == NULL)
     {
-      sound = new SoundManager;
+        sound = new SoundManager;
 
-      Pa_Initialize();
-      sound->initAudio();
-      sound->startStream();
+        Pa_Initialize();
+        sound->initAudio();
+        sound->startStream();
     }
 
-  return sound;
+    return sound;
 }
 
 int     main(int ac, char **av)
@@ -36,15 +36,14 @@ int     main(int ac, char **av)
     try {
         ISocket *server = ISocket::getClient(ip, port);
 
-	getSound();
+        getSound();
         server->start();
 
         while (42) {
 
-                getSound()->setReceivedRetenc(getSound()->getRetenc());
-                getSound()->setReceivedData(getSound()->getData());
-	            server->writePacket(Packet::pack<SoundPacket>(*(getSound()->getStruct())));
-            }
+            usleep(5);
+            server->writePacket(Packet::pack<SoundPacket>(*(getSound()->getStruct())));
+        }
 
         server->cancel();
         sleep(1);

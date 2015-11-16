@@ -29,21 +29,24 @@ SoundManager	*getSound()
 void	onReceive(ISocket* client)
 {
     Packet* packet;
-    if ((packet = client->readPacket()) == NULL)
-        return;
 
-    if (packet->getType() == Packet::String)
-    {
-        std::cout << *(packet->unpack<std::string>()) << std::endl;
-    }
+    while ((packet = client->readPacket()) != NULL) {
 
-    if (packet->getType() == Packet::Sound)
-    {
-        SoundPacket *sound = packet->unpack<SoundPacket>();
+        if (packet->getType() == Packet::String) {
 
-        std::cout << sound->retenc << std::endl;
-        getSound()->setReceivedRetenc(sound->retenc);
-        getSound()->setReceivedData(sound->data);
+            std::string *str = packet->unpack<std::string>();
+            std::cout << *str << std::endl;
+            delete str;
+        }
+        else if (packet->getType() == Packet::Sound) {
+
+            SoundPacket *sound = packet->unpack<SoundPacket>();
+
+            getSound()->setReceivedRetenc(sound->retenc);
+            getSound()->setReceivedData(sound->data);
+            delete sound;
+        }
+        delete packet;
     }
 }
 

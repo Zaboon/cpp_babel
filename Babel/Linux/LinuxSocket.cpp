@@ -92,6 +92,9 @@ LinuxSocket::launchClient(unsigned int __attribute__((__unused__)) thread_id, Li
     ufd[0].events = POLLIN;
     ufd[1].events = POLLOUT;
 
+    IMutex *read = (*MutexVault::getMutexVault())["read" + MutexVault::toString(client->getId())];
+    IMutex *write = (*MutexVault::getMutexVault())["write" + MutexVault::toString(client->getId())];
+
     //if onConnect is attached
     if ((handler[0] = client->getOnConnect()) != NULL)
         handler[0](client);
@@ -100,13 +103,12 @@ LinuxSocket::launchClient(unsigned int __attribute__((__unused__)) thread_id, Li
     {
         if ((rv = poll(&ufd[0], 1, TIMEOUT)) == -1)
             client->_status = ISocket::Canceled;
+        read->lock(true);
         if (rv > 0)
         {
             //begin protected action
-            (*vault)["read" + MutexVault::toString(client->getId())]->lock(true);
-
             if (client->_read_buffer.size() > MAX_BUFFER_SIZE)
-                client->_read_buffer.erase(client->_read_buffer.begin() + (client->_read_buffer.size() / 2), client->_read_buffer.end());
+                client->_read_buffer.empty();
             client->_read_buffer.clear();
             if ((read_val = recv(client->_socket, &buffer[0], READ_HEAP, 0)) == -1)
                 client->_status = ISocket::Canceled;
@@ -115,32 +117,32 @@ LinuxSocket::launchClient(unsigned int __attribute__((__unused__)) thread_id, Li
             else {
                 for (unsigned int i = 0; i < read_val; i++)
                     client->_read_buffer.push_back(buffer[i]);
-                //while protected -> summon onReceive
-                if ((handler[1] = client->getOnReceive()) != NULL)
-                    handler[1](client);
             }
-            (*vault)["read" + MutexVault::toString(client->getId())]->unlock();
             //end protected action
         }
-        else if (client->getStatus() != ISocket::Canceled && !client->_write_buffer.empty())
+        //while protected -> summon onReceive
+        if (client->_read_buffer.size() > 0 && (handler[1] = client->getOnReceive()) != NULL)
+            handler[1](client);
+        read->unlock();
+
+
+        if ((rv = poll(&ufd[1], 1, TIMEOUT)) == -1)
+            client->_status = ISocket::Canceled;
+        if (rv > 0)
         {
-            if ((rv = poll(&ufd[1], 1, TIMEOUT)) == -1)
-                client->_status = ISocket::Canceled;
-            if (rv > 0)
-            {
-                //begin protected action
-                (*vault)["write" + MutexVault::toString(client->getId())]->lock(true);
-                if ((send_val = send(client->_socket, &(client->_write_buffer[0]),
-                                     (client->_write_buffer.size() > 2000) ? (2000) : (client->_write_buffer.size()), 0)) == -1)
+            //begin protected action
+            write->lock(true);
+            if (client->_write_buffer.size() > 0) {
+
+                if ((send_val = send(client->_socket, &(client->_write_buffer[0]), client->_write_buffer.size(), 0)) == -1)
                     client->_status = ISocket::Canceled;
-                //delete sent data
                 if (send_val > 0)
                     client->_write_buffer.erase(client->_write_buffer.begin(), client->_write_buffer.begin() + send_val);
-                (*vault)["write" + MutexVault::toString(client->getId())]->unlock();
-                //end protected action
             }
-            //no event
+            write->unlock();
+            //end protected action
         }
+        //no event
     }
     client->cancel();
     if ((handler[2] = client->getOnDisconnect()) != NULL)

@@ -146,16 +146,15 @@ ISocket::write(const std::vector<unsigned char> &data, unsigned int id)
 
     if (this->_type == ISocket::Client)
     {
-        if (MutexVault::isBadPtr((mutex = (*MutexVault::getMutexVault())["write" + MutexVault::toString(this->_id)])))
-            return;
+        mutex = (*MutexVault::getMutexVault())["write" + MutexVault::toString(this->_id)];
         mutex->lock(true);
-        this->_write_buffer.insert(this->_write_buffer.end(), data.begin(), data.end());
+        for (unsigned int i = 0; i < data.size(); i++)
+            this->_write_buffer.push_back(data[i]);
         mutex->unlock();
     }
     else
     {
-        if (MutexVault::isBadPtr((mutex = (*MutexVault::getMutexVault())["serverTargets"])))
-            return;
+        mutex = (*MutexVault::getMutexVault())["serverTargets"];
         mutex->lock(true);
         if (id != 0 && id < this->_targets.size() && this->_targets[id - 1]->getStatus() == ISocket::Running)
             this->_targets[id - 1]->write(data);
