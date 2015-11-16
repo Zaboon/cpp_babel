@@ -303,7 +303,7 @@ Packet::getSound()
     sound->data = new unsigned char[480]();
     ptr = reinterpret_cast<unsigned char *>(&(sound->retenc));
     for (unsigned int i = 0; i < sizeof(int); i++)
-        (*ptr) = this->_data[i];
+        ptr[i] = this->_data[i];
     for (unsigned int i = sizeof(int); i < FRAMES_PER_BUFFER + sizeof(int); i++)
         sound->data[i - sizeof(int)] = this->_data[i];
     return (sound);

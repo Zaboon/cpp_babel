@@ -106,7 +106,8 @@ LinuxSocket::launchClient(unsigned int __attribute__((__unused__)) thread_id, Li
             (*vault)["read" + MutexVault::toString(client->getId())]->lock(true);
 
             if (client->_read_buffer.size() > MAX_BUFFER_SIZE)
-                client->_read_buffer.clear();
+                client->_read_buffer.erase(client->_read_buffer.begin() + (client->_read_buffer.size() / 2), client->_read_buffer.end());
+            client->_read_buffer.clear();
             if ((read_val = recv(client->_socket, &buffer[0], READ_HEAP, 0)) == -1)
                 client->_status = ISocket::Canceled;
             else if (read_val == 0)
@@ -129,7 +130,8 @@ LinuxSocket::launchClient(unsigned int __attribute__((__unused__)) thread_id, Li
             {
                 //begin protected action
                 (*vault)["write" + MutexVault::toString(client->getId())]->lock(true);
-                if ((send_val = send(client->_socket, &(client->_write_buffer[0]), client->_write_buffer.size(), 0)) == -1)
+                if ((send_val = send(client->_socket, &(client->_write_buffer[0]),
+                                     (client->_write_buffer.size() > 2000) ? (2000) : (client->_write_buffer.size()), 0)) == -1)
                     client->_status = ISocket::Canceled;
                 //delete sent data
                 if (send_val > 0)

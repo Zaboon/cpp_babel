@@ -32,7 +32,6 @@ void	onReceive(ISocket* client)
     if ((packet = client->readPacket()) == NULL)
         return;
 
-    std::cout << packet->getType() << " : " << Packet::Sound << std::endl;
     if (packet->getType() == Packet::String)
     {
         std::cout << *(packet->unpack<std::string>()) << std::endl;
@@ -40,9 +39,9 @@ void	onReceive(ISocket* client)
 
     if (packet->getType() == Packet::Sound)
     {
-        std::cout << "SOUND" << std::endl;
         SoundPacket *sound = packet->unpack<SoundPacket>();
 
+        std::cout << sound->retenc << std::endl;
         getSound()->setReceivedRetenc(sound->retenc);
         getSound()->setReceivedData(sound->data);
     }
