@@ -210,8 +210,6 @@ BabelServer::executeIdentity(Identity *identity, ISocket *client)
 
     if (identity == NULL)
         return;
-    std::cout << "Recv identity " << identity << std::endl;
-    std::cout << CONNECTION << " " << identity->getInstruct() << std::endl;
     mutex->lock(true);
     if ((client_profile = server->getByClient(client)) == NULL && identity->getInstruct() == CONNECTION &&
             (identity->hasAdressAndName() && server->getByUsername(identity->getUsername()) == NULL))
@@ -220,7 +218,7 @@ BabelServer::executeIdentity(Identity *identity, ISocket *client)
         Identity id(identity->getUsername(), ADDCONTACT);
         server->sendPacketToAllRegisteredUsers(new Packet(id), client);
         client->writePacket(new Packet(OK));
-        std::cout << "username : " << identity->getUsername() << std::endl;
+        std::cout << "Welcome, " << identity->getUsername() << "!" << std::endl;
     }
     else {
         std::cout << "NOT NULL" << std::endl;
@@ -272,6 +270,7 @@ BabelServer::onReceive(ISocket *client)
         }
         else {
 
+            std::vector<unsigned char> k = client->read(0);
             if (packet->getType() == Packet::Id)
                 BabelServer::executeIdentity(packet->unpack<Identity>(rsa), client);
             else if (packet->getType() == Packet::Inst)

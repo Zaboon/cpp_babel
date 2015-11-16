@@ -26,13 +26,16 @@ int     main(int ac, char **av)
         server->attachOnDisconnect(BabelClient::onDisconnect);
 
         server->start();
-        std::cout << "Server up and ready on " << server->getIp() << " port " << server->getPort() << " status " << server->getStatus() << std::endl;
 
         std::string s;
         while (s != "quit") {
+
             std::getline(std::cin, s);
+            if (server->getSendRsa() != NULL)
+                std::cout << "Sending encrypted string" << std::endl;
             server->writePacket(Packet::pack<std::string>(s));
         }
+
         server->cancel();
         sleep(1);
         delete server;
