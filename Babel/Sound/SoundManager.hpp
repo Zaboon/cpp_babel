@@ -5,12 +5,6 @@
 #include "EncodeManager.hpp"
 #include "portaudio.h"
 
-struct SoundPacket
-{
-    int                         retenc;
-    unsigned char               data[FRAMES_PER_BUFFER];
-};
-
 class SoundManager : public IAudio
 {
 private:
@@ -38,7 +32,7 @@ public:
   virtual int		startStream();
   virtual int		stopStream();
   virtual IEncode*	getEnc();
-  virtual const std::pair<const unsigned char *, const int> getData() const;
+  virtual SoundPacket*	getData() const;
   virtual void		setData(unsigned char *);
   virtual unsigned char*getBuffer() const;
   virtual int	getRetenc() const;

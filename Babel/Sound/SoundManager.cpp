@@ -97,7 +97,7 @@ int playCallback(const void *input, void *output,
   (void)statusFlags;
   (void)input;
 
-  dis->getEnc()->decodeAudio(dis->getData().first, out, dis->getData().second);
+  dis->getEnc()->decodeAudio(dis->getData()->data, out, (dis->getData())->retenc);
   return paContinue;
 }
 
@@ -187,9 +187,15 @@ IEncode       *SoundManager::getEnc()
   return (this->_opus);
 }
 
-const std::pair<const unsigned char *, const int>       SoundManager::getData() const
+SoundPacket       *SoundManager::getData() const
 {
-  return (std::make_pair(this->_data, this->_enc_ret));
+  static	SoundPacket* sp= NULL;
+
+  if (!sp)
+    sp = new SoundPacket;
+  sp->retenc = this->getRetenc();
+  std::memcpy(sp->data, _data, FRAMES_PER_BUFFER);
+  return sp;
 }
 
 unsigned char*	SoundManager::getBuffer() const
@@ -206,7 +212,6 @@ int                       SoundManager::getRetenc() const
 {
   return (this->_enc_ret);
 }
-
 void            SoundManager::setRetenc(int retenc)
 {
   this->_enc_ret = retenc;

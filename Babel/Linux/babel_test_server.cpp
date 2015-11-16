@@ -8,6 +8,35 @@
 #include "LinuxSocket.h"
 #include "../BabelServer.hpp"
 
+SoundManager	*getSound()
+{
+  static SoundManager *sound = NULL;
+
+  if (sound == NULL)
+    {
+      sound = new SoundManager;
+
+      Pa_Initialize();
+      sound->initAudio();
+      sound->startStream();
+    }
+
+  return sound;
+}
+
+void	onReceive(ISocket* client)
+{
+  Packet* packet= client->readPacket(0);
+
+  if (packet->getType() == Packet::Sound)
+    {
+      SoundPacket *sound = packet->unpack<SoundPacket>();
+
+      getSound()->setRetenc(sound->retenc);
+      getSound()->setData(sound->data);
+    }
+}
+
 int     main(int ac, char **av)
 {
     int port;
@@ -18,26 +47,18 @@ int     main(int ac, char **av)
 
     try {
         ISocket *server = ISocket::getServer(port);
-        BabelServer *serv = BabelServer::getInstance();
 
-        server->attachOnConnect(BabelServer::onConnect);
-        server->attachOnReceive(BabelServer::onReceive);
-        server->attachOnDisconnect(BabelServer::onDisconnect);
-
+	server->attachOnReceive(onReceive);
+	
+	getSound();
         server->start();
         std::cout << "Server up and ready on " << server->getIp() << " port " << server->getPort() << " status " << server->getStatus() << std::endl;
 
-        std::string s;
-        while (s != "quit") {
-            std::getline(std::cin, s);
-
-            if (s == "users")
-                serv->showConnectedUsers();
-            else
-                server->writePacket(Packet::pack<std::string>(s));
-        }
+	while (42)
+	  {
+	    
+	  }
         server->cancel();
-        BabelServer::getInstance(true);
         sleep(1);
         //delete server;
         //delete serv;

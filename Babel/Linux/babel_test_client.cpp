@@ -8,6 +8,22 @@
 #include "LinuxSocket.h"
 #include "../BabelClient.hpp"
 
+SoundManager	*getSound()
+{
+  static SoundManager *sound = NULL;
+
+  if (sound == NULL)
+    {
+      sound = new SoundManager;
+
+      Pa_Initialize();
+      sound->initAudio();
+      sound->startStream();
+    }
+
+  return sound;
+}
+
 int     main(int ac, char **av)
 {
     int port;
@@ -19,27 +35,18 @@ int     main(int ac, char **av)
 
     try {
         ISocket *server = ISocket::getClient(ip, port);
-        BabelClient *cl = BabelClient::getInstance();
 
-        server->attachOnConnect(BabelClient::onConnect);
-        server->attachOnReceive(BabelClient::onReceive);
-        server->attachOnDisconnect(BabelClient::onDisconnect);
-
+	getSound();
         server->start();
 
-        std::string s;
-        while (s != "quit") {
+        while (42) {
 
-            std::getline(std::cin, s);
-            if (server->getSendRsa() != NULL)
-                std::cout << "Sending encrypted string" << std::endl;
-            server->writePacket(Packet::pack<std::string>(s));
+	  server->writePacket(Packet::pack<SoundPacket>(*(getSound()->getData())));
         }
 
         server->cancel();
         sleep(1);
         delete server;
-        delete cl;
     }
     catch (const char *e) {
         std::cout << e << std::endl;

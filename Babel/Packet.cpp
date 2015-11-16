@@ -78,13 +78,13 @@ Packet::Packet(Rsa &rsa) : _type(Packet::SSLPublicKey)
 
 Packet::Packet(SoundPacket &p) : _type(Packet::Sound)
 {
-    unsigned int *ptr;
+    unsigned char *ptr;
 
-    ptr = &(p.retenc);
+    ptr = reinterpret_cast<unsigned char *>(&(p.retenc));
     for (unsigned int i = 0; i < sizeof(int); i++)
         this->_data.push_back(ptr[i]);
     for (unsigned int i = 0; i < FRAMES_PER_BUFFER; i++)
-        this->_data.push_back(p[i]);
+        this->_data.push_back(ptr[i]);
 }
 
 //static
@@ -286,9 +286,9 @@ SoundPacket*
 Packet::getSound()
 {
     SoundPacket *sound = new SoundPacket;
-    unsigned int *ptr;
+    unsigned char *ptr;
 
-    ptr = &(sound->retenc);
+    ptr = reinterpret_cast<unsigned char *>(&(sound->retenc));
     for (unsigned int i = 0; i < sizeof(int); i++)
         (*ptr) = this->_data[i];
     for (unsigned int i = sizeof(int); i < FRAMES_PER_BUFFER + sizeof(int); i++)
