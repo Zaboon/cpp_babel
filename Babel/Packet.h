@@ -27,7 +27,7 @@ public:
         Id = 0x12345678,
         Inst = 0x51515151,
         SSLPublicKey = 0x4ab2321a,
-        Sound = 0x987654321
+        Sound = 0x98765432
     };
 
     //object specific constructors
@@ -85,6 +85,8 @@ public:
             return (reinterpret_cast<T *>(this->getRsa()));
         else if (typeid(T) == typeid(Identity))
             return (reinterpret_cast<T *>(this->getIdentity()));
+        else if (typeid(T) == typeid(Instruct))
+            return (reinterpret_cast<T *>(this->getInstruction()));
         else if (typeid(T) == typeid(SoundPacket))
             return (reinterpret_cast<T *>(this->getSound()));
         return (NULL);

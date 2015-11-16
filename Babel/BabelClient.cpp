@@ -3,14 +3,17 @@
 //
 
 #include "BabelClient.hpp"
+#include <unistd.h>
 
 BabelClient *
 BabelClient::getInstance()
 {
     static BabelClient *_this;
 
-    if (_this == NULL)
+    if (_this == NULL) {
         _this = new BabelClient;
+        _this->connected = false;
+    }
     return (_this);
 }
 
@@ -29,11 +32,18 @@ BabelClient::getContacts()
 }
 
 void
+BabelClient::setConnected(bool status)
+{
+    this->connected = status;
+}
+
+void
 BabelClient::addContact(Identity *id)
 {
     IMutex *mutex = (*MutexVault::getMutexVault())["contacts"];
 
     mutex->lock(true);
+    std::cout << "new contact : " << id->getUsername() << std::endl;
     this->_contacts.push_back(id);
     mutex->unlock();
 }
@@ -44,6 +54,7 @@ BabelClient::removeContact(Identity *id)
     IMutex *mutex = (*MutexVault::getMutexVault())["contacts"];
 
     mutex->lock(true);
+    std::cout << "remove contact : " << id->getUsername() << std::endl;
     for (unsigned int i = 0; i < this->_contacts.size(); i++)
         if (this->_contacts[i] == id)
         {
@@ -157,6 +168,41 @@ BabelClient::onDisconnect(ISocket *client)
 }
 
 void
+BabelClient::waitingForUsernameValidation(ISocket *client)
+{
+    Packet *packet;
+    Instruct *instruct;
+
+    if ((packet = client->readPacket(0)) != NULL) {
+
+        if (packet->getType() == Packet::Inst &&
+            (instruct = packet->unpack<Instruct>()) != NULL) {
+
+            if (*instruct == OK) {
+                std::cout << "Successfully logged in!" << std::endl;
+                BabelClient::getInstance()->setConnected(true);
+                client->attachOnReceive(BabelClient::onReceive);
+            }
+            else {
+                std::cout << "Failed to log in!" << std::endl;
+                std::cout << "Try username caca" << std::endl;
+                Identity i("caca", "127.0.0.1", 4242, CONNECTION);
+                client->writePacket(new Packet(i));
+            }
+            delete instruct;
+        }
+        delete packet;
+        return;
+    }
+}
+
+void
+BabelClient::inputUsername(ISocket *client)
+{
+    client->attachOnReceive(BabelClient::waitingForUsernameValidation);
+}
+
+void
 BabelClient::onReceive(ISocket *client)
 {
     Packet  *packet;
@@ -166,30 +212,38 @@ BabelClient::onReceive(ISocket *client)
         //but first, let me take a RSA
         Rsa *rsa;
         if ((rsa = client->getSendRsa()) == NULL) {
+
             if (packet->getType() == Packet::SSLPublicKey) {
+
                 if (packet->isEncrypted())
                     client->attachRsa(packet->unpack<Rsa>(client->getRecvRsa()));
                 else
                     client->attachRsa(packet->unpack<Rsa>());
-                std::cout << "Ok for public key" << std::endl;
+
+                std::cout << "Ok for public key for " << client->getIp() << std::endl;
+
+                std::cout << "Try username pipi" << std::endl;
                 Identity i("pipi", "127.0.0.1", 4242, CONNECTION);
                 client->writePacket(new Packet(i));
+                //redirect for response
+                client->attachOnReceive(BabelClient::waitingForUsernameValidation);
             }
-        }
-        else if (packet->isEncrypted()) {
-
-            if (packet->getType() == Packet::Id)
-                BabelClient::executeIdentity(packet->unpack<Identity>(rsa), client);
-            else if (packet->getType() == Packet::Inst)
-                BabelClient::executeInstruction(packet->unpack<Instruct>(rsa), client);
         }
         else if (packet->getType() == Packet::String) {
 
-            std::string *msg = packet->unpack<std::string>(rsa);
+            std::string *msg = packet->unpack<std::string>();
             std::cout << "Received message from " << client->getIp() << " (msg_length : " << msg->size() << ") : ";
             std::cout << *msg << std::endl;
             delete msg;
         }
+        else ;{
+
+            if (packet->getType() == Packet::Id)
+                BabelClient::executeIdentity(packet->unpack<Identity>(), client);
+            else if (packet->getType() == Packet::Inst)
+                BabelClient::executeInstruction(packet->unpack<Instruct>(), client);
+        }
+
 
         delete packet;
     }

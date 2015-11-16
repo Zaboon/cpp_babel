@@ -33,6 +33,8 @@ public:
     void addContact(Identity *id);
     void removeContact(Identity *id);
 
+    void setConnected(bool status);
+
     static bool answer(ISocket *client);
 
     static void executeIdentity(Identity *, ISocket *client);
@@ -42,6 +44,8 @@ public:
     static void onConnect(ISocket *client);
 
     static void onReceive(ISocket *client);
+    static void waitingForUsernameValidation(ISocket *client);
+    static void inputUsername(ISocket *client);
 
     static void onDisconnect(ISocket *client);
 
@@ -49,6 +53,7 @@ private:
 
     BabelClient() : asked_call(false), _peer(NULL) {};
 
+    bool connected;
     bool asked_call;
     Instruct *latest_cmd;
     std::vector<Identity *> _contacts;

@@ -13,7 +13,7 @@ Packet::Packet(Instruct instruction) : _type(Packet::Inst)
 
     instr = reinterpret_cast<unsigned char *>(&instruction);
 
-    for (unsigned int i = 0; i < sizeof(instr); i++)
+    for (unsigned int i = 0; i < sizeof(Instruct); i++)
         this->_data.push_back(instr[i]);
     this->_encrypted = false;
 }
