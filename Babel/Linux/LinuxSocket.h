@@ -17,9 +17,9 @@
 #include "../BBException.hpp"
 
 #define MAX_CLIENTS 42
-#define TIMEOUT 5
-#define READ_HEAP 21920
-#define MAX_BUFFER_SIZE 40960
+#define TIMEOUT 20
+#define READ_HEAP 40800
+#define MAX_BUFFER_SIZE 400960
 
 class LinuxSocket : public ISocket
 {

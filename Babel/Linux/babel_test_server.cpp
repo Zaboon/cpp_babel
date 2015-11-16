@@ -10,32 +10,41 @@
 
 SoundManager	*getSound()
 {
-  static SoundManager *sound = NULL;
+    static SoundManager *sound = NULL;
 
-  if (sound == NULL)
+    if (sound == NULL)
     {
-      sound = new SoundManager;
+        sound = new SoundManager;
 
         sound->setReceivedRetenc(0);
         sound->setReceivedData(NULL);
-      Pa_Initialize();
-      sound->initAudio();
-      sound->startStream();
+        Pa_Initialize();
+        sound->initAudio();
+        sound->startStream();
     }
 
-  return sound;
+    return sound;
 }
 
 void	onReceive(ISocket* client)
 {
-  Packet* packet= client->readPacket(0);
+    Packet* packet;
+    if ((packet = client->readPacket()) == NULL)
+        return;
 
-  if (packet->getType() == Packet::Sound)
+    std::cout << packet->getType() << " : " << Packet::Sound << std::endl;
+    if (packet->getType() == Packet::String)
     {
-      SoundPacket *sound = packet->unpack<SoundPacket>();
+        std::cout << *(packet->unpack<std::string>()) << std::endl;
+    }
 
-      getSound()->setReceivedRetenc(sound->retenc);
-      getSound()->setReceivedData(sound->data);
+    if (packet->getType() == Packet::Sound)
+    {
+        std::cout << "SOUND" << std::endl;
+        SoundPacket *sound = packet->unpack<SoundPacket>();
+
+        getSound()->setReceivedRetenc(sound->retenc);
+        getSound()->setReceivedData(sound->data);
     }
 }
 
@@ -50,16 +59,16 @@ int     main(int ac, char **av)
     try {
         ISocket *server = ISocket::getServer(port);
 
-	server->attachOnReceive(onReceive);
-	
-	getSound();
+        server->attachOnReceive(onReceive);
+
+        getSound();
         server->start();
         std::cout << "Server up and ready on " << server->getIp() << " port " << server->getPort() << " status " << server->getStatus() << std::endl;
 
-	while (42)
-	  {
-	    
-	  }
+        std::string s;
+        while (s != "quit") {
+            std::getline(std::cin, s);
+        }
         server->cancel();
         sleep(1);
         //delete server;

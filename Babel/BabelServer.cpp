@@ -254,7 +254,7 @@ BabelServer::onReceive(ISocket *client)
     bool    res = true;
 
     //get packet
-    if ((packet = client->readPacket(0)) != NULL) {
+    if ((packet = client->readPacket()) != NULL) {
         //but first, let me take a RSA
         Rsa *rsa;
         if ((rsa = client->getSendRsa()) == NULL) {
@@ -271,7 +271,6 @@ BabelServer::onReceive(ISocket *client)
         }
         else {
 
-            std::vector<unsigned char> k = client->read(0);
             if (packet->getType() == Packet::Id)
                 BabelServer::executeIdentity(packet->unpack<Identity>(), client);
             else if (packet->getType() == Packet::Inst)

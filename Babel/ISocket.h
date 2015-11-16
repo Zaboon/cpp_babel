@@ -57,7 +57,7 @@ public:
 
 	std::vector<unsigned char> read(unsigned int bytes);
 
-	Packet *readPacket(unsigned int bytes);
+	Packet *readPacket();
 
 	void write(const std::vector<unsigned char> &data, unsigned int id = 0);
 

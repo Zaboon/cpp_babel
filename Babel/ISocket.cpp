@@ -118,13 +118,25 @@ ISocket::read(unsigned int bytes)
 }
 
 Packet *
-ISocket::readPacket(unsigned int bytes)
+ISocket::readPacket()
 {
     std::vector<unsigned char> data;
-    Packet *p;
+    int packetSize;
+    unsigned totalSize;
 
-    data = this->read(0);
-    return (Packet::fromStream(data, (this->_mustEncrypt ? this->getRecvRsa() : NULL)));
+    IMutex *mutex = (*MutexVault::getMutexVault())["read" + MutexVault::toString(this->_id)];
+    mutex->lock(true);
+    if ((packetSize = Packet::extractSizeFromHeader(this->_read_buffer)) != -1 &&
+        (totalSize = (packetSize + static_cast<int>(Packet::getHeaderSize()))) <= this->_read_buffer.size()) {
+
+        for (unsigned int i = 0; i < totalSize; i++)
+            data.push_back(this->_read_buffer[i]);
+        this->_read_buffer.erase(this->_read_buffer.begin(), this->_read_buffer.begin() + totalSize);
+        mutex->unlock();
+        return (Packet::fromStream(data, (this->_mustEncrypt ? this->getRecvRsa() : NULL)));
+    }
+    mutex->unlock();
+    return (NULL);
 }
 
 void

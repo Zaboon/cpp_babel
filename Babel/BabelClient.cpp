@@ -173,7 +173,7 @@ BabelClient::waitingForUsernameValidation(ISocket *client)
     Packet *packet;
     Instruct *instruct;
 
-    if ((packet = client->readPacket(0)) != NULL) {
+    if ((packet = client->readPacket()) != NULL) {
 
         if (packet->getType() == Packet::Inst &&
             (instruct = packet->unpack<Instruct>()) != NULL) {
@@ -208,7 +208,7 @@ BabelClient::onReceive(ISocket *client)
     Packet  *packet;
 
     //get packet
-    if ((packet = client->readPacket(0)) != NULL) {
+    if ((packet = client->readPacket()) != NULL) {
         //but first, let me take a RSA
         Rsa *rsa;
         if ((rsa = client->getSendRsa()) == NULL) {

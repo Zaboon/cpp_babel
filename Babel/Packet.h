@@ -63,6 +63,22 @@ public:
         return (new Packet(obj));
     };
 
+    static int extractSizeFromHeader(std::vector<unsigned char> &data)
+    {
+        unsigned int headerSize = Packet::getHeaderSize();
+        if (data.size() <= headerSize)
+            return (-1);
+
+        unsigned int *r_magic = reinterpret_cast<unsigned int *>(&data[0]);
+        Packet::Type *r_type = reinterpret_cast<Packet::Type *>(&data[sizeof(unsigned int)]);
+        unsigned int *r_size = reinterpret_cast<unsigned int *>(&data[sizeof(unsigned int) * 2]);
+        unsigned int *r_encrypted = reinterpret_cast<unsigned int *>(&data[sizeof(unsigned int) * 3]);
+
+        if (*r_magic != _MAGIC_ || *r_size + headerSize > data.size() || !(*r_encrypted == 0 || *r_encrypted == 1))
+            return (-1);
+        return (*r_size);
+    }
+
     //build a bytestream from the packet
     std::vector<unsigned char>              *build(Rsa *rsa = NULL);
 
