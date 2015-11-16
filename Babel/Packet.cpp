@@ -76,6 +76,17 @@ Packet::Packet(Rsa &rsa) : _type(Packet::SSLPublicKey)
     this->_encrypted = false;
 }
 
+Packet::Packet(SoundPacket &p) : _type(Packet::Sound)
+{
+    unsigned int *ptr;
+
+    ptr = &(p.retenc);
+    for (unsigned int i = 0; i < sizeof(int); i++)
+        this->_data.push_back(ptr[i]);
+    for (unsigned int i = 0; i < p.data.size(); i++)
+        this->_data.push_back(p.data[i]);
+}
+
 //static
 unsigned int
 Packet::getHeaderSize()
@@ -269,4 +280,18 @@ Packet::getInstruction()
     for (unsigned int i = 0; i < sizeof(Instruct); i++)
         ptr[i] = this->_data[i];
     return (_instruction);
+}
+
+SoundPacket*
+Packet::getSound()
+{
+    SoundPacket *sound = new SoundPacket;
+    unsigned int *ptr;
+
+    ptr = &(sound->retenc);
+    for (unsigned int i = 0; i < sizeof(int); i++)
+        (*ptr) = this->_data[i];
+    for (unsigned int i = sizeof(int); i < this->_data.size() - (sizeof(int)); i++)
+        sound->data.push_back(this->_data[i]);
+    return (sound);
 }

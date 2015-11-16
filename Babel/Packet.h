@@ -10,6 +10,7 @@
 #include <typeinfo>
 #include "Rsa.h"
 #include "Identity.hpp"
+#include "Sound/SoundManager.hpp"
 
 #define _MAGIC_ 0x0101010
 
@@ -25,7 +26,8 @@ public:
         IntVector = 0x42424242,
         Id = 0x12345678,
         Inst = 0x51515151,
-        SSLPublicKey = 0x4ab2321a
+        SSLPublicKey = 0x4ab2321a,
+        Sound = 0x987654321
     };
 
     //object specific constructors
@@ -34,6 +36,7 @@ public:
     Packet(std::string &str);
     Packet(std::vector<int> &vec);
     Packet(Rsa &);
+    Packet(SoundPacket &);
 
     static std::vector<unsigned char>& stringToStream(char *buf, int const size)
     {
@@ -82,6 +85,8 @@ public:
             return (reinterpret_cast<T *>(this->getRsa()));
         else if (typeid(T) == typeid(Identity))
             return (reinterpret_cast<T *>(this->getIdentity()));
+        else if (typeid(T) == typeid(SoundPacket))
+            return (reinterpret_cast<T *>(this->getSound()));
         return (NULL);
     };
 
@@ -94,11 +99,6 @@ public:
 
     std::vector<unsigned char>              &getData();
 
-    Identity*                               getIdentity();
-    std::string *getString();
-
-    Instruct*                               getInstruction();
-
 protected:
 
     //properties
@@ -110,8 +110,12 @@ protected:
     Packet();
 
     //object getters
-    std::vector<int> *getIntVector();
-    Rsa *getRsa();
+    Identity                                *getIdentity();
+    std::string                             *getString();
+    Instruct                                *getInstruction();
+    std::vector<int>                        *getIntVector();
+    Rsa                                     *getRsa();
+    SoundPacket                             *getSound();
 };
 
 #endif //CPP_BABEL_PACKET_H

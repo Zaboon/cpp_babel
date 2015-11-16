@@ -5,6 +5,12 @@
 #include "EncodeManager.hpp"
 #include "portaudio.h"
 
+struct SoundPacket
+{
+    int                         retenc;
+    std::vector<unsigned char>  data;
+};
+
 class SoundManager : public IAudio
 {
 private:
