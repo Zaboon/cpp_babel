@@ -5,7 +5,6 @@ SoundManager::SoundManager()
   _opus = new EncodeManager;
   _streamIn = NULL;
   _streamOut = NULL;
-  for (int i = 0; i < FRAMES_PER_BUFFER; i++) _buff[i] = 0; /* memset */
   _run = true;
 }
 

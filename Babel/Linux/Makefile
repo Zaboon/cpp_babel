@@ -1,5 +1,4 @@
 CC	=	g++
-
 RM	=	rm -f
 
 SRC_SERV	=	babel_test_server.cpp	\
@@ -9,7 +8,9 @@ SRC_SERV	=	babel_test_server.cpp	\
 				../Packet.cpp			\
 				../Rsa.cpp				\
 				../BBException.cpp		\
-				../BabelServer.cpp
+				../BabelServer.cpp		\
+				../Sound/SoundManager.cpp	\
+				../Sound/EncodeManager.cpp
 
 SRC_CLIENT	=	babel_test_client.cpp	\
 				LinuxSocket.cpp			\
@@ -18,7 +19,9 @@ SRC_CLIENT	=	babel_test_client.cpp	\
 				../Packet.cpp			\
 				../Rsa.cpp				\
 				../BBException.cpp		\
-				../BabelClient.cpp
+				../BabelClient.cpp		\
+				../Sound/SoundManager.cpp	\
+				../Sound/EncodeManager.cpp
 
 OBJ_SERV	=	$(SRC_SERV:.cpp=.o)
 
@@ -28,7 +31,7 @@ NAME_S		=	server
 
 NAME_C		=	client
 
-LIBS		=	-L. -lpthread -lcrypto -lssl -g3
+LIBS		=	-L. -lpthread -lcrypto -lssl -g3 -L../Sound -lopus -lrt -lasound -ljack -lm -lportaudio
 
 all	:	$(NAME_S) $(NAME_C)
 
