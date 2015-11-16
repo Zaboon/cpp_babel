@@ -8,7 +8,7 @@
 struct SoundPacket
 {
     int                         retenc;
-    std::vector<unsigned char>  data;
+    unsigned char               data[FRAMES_PER_BUFFER];
 };
 
 class SoundManager : public IAudio
