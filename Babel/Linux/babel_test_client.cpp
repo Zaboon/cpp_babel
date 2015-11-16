@@ -40,9 +40,9 @@ int     main(int ac, char **av)
         server->start();
 
         while (42) {
-
-	  server->writePacket(Packet::pack<SoundPacket>(*(getSound()->getData())));
-        }
+            (getSound()->getStruct());
+	  server->writePacket(Packet::pack<SoundPacket>(*(getSound()->getStruct())));
+            }
 
         server->cancel();
         sleep(1);

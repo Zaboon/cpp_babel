@@ -16,6 +16,8 @@ SoundManager	*getSound()
     {
       sound = new SoundManager;
 
+        sound->setReceivedRetenc(0);
+        sound->setReceivedData(NULL);
       Pa_Initialize();
       sound->initAudio();
       sound->startStream();
