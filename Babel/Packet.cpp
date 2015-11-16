@@ -83,8 +83,8 @@ Packet::Packet(SoundPacket &p) : _type(Packet::Sound)
     ptr = &(p.retenc);
     for (unsigned int i = 0; i < sizeof(int); i++)
         this->_data.push_back(ptr[i]);
-    for (unsigned int i = 0; i < p.data.size(); i++)
-        this->_data.push_back(p.data[i]);
+    for (unsigned int i = 0; i < FRAMES_PER_BUFFER; i++)
+        this->_data.push_back(p[i]);
 }
 
 //static
@@ -291,7 +291,7 @@ Packet::getSound()
     ptr = &(sound->retenc);
     for (unsigned int i = 0; i < sizeof(int); i++)
         (*ptr) = this->_data[i];
-    for (unsigned int i = sizeof(int); i < this->_data.size() - (sizeof(int)); i++)
-        sound->data.push_back(this->_data[i]);
+    for (unsigned int i = sizeof(int); i < FRAMES_PER_BUFFER + sizeof(int); i++)
+        sound->data[i - sizeof(int)] = this->_data[i];
     return (sound);
 }
