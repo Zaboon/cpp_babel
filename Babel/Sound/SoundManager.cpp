@@ -9,6 +9,7 @@ SoundManager::SoundManager(){
 	this->_streamin = NULL;
 	this->_streamout = NULL;
 	this->_run = true;
+	_data = new unsigned char[480]();
 }
 
 SoundManager::~SoundManager(){
@@ -239,14 +240,22 @@ int						SoundManager::getReceivedRetenc() const
 	return _receivedRetenc;
 }
 
-SoundPacket       *SoundManager::getStruct() const
+SoundPacket       *SoundManager::getStruct()
 {
-	static	SoundPacket* sp= NULL;
+	SoundPacket* sp= NULL;
 
-	if (!sp)
+	if (sp == NULL) {
 		sp = new SoundPacket;
+		sp->data = new unsigned char[480]();
+	}
+	std::cout << "OK" << std::endl;
 	sp->retenc = this->getRetenc();
+	std::cout << "OK" << std::endl;
 	for (int i = 0; i < FRAMES_PER_BUFFER; i++)
+	{
+		std::cout << i << std::endl;
 		sp->data[i] = _data[i];
+	}
+	std::cout << "OK" << std::endl;
 	return sp;
 }

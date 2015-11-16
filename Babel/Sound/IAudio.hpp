@@ -11,7 +11,7 @@
 struct SoundPacket
 {
     int                         retenc;
-    unsigned char               data[FRAMES_PER_BUFFER];
+    unsigned char               *data;
 };
 
 class	        IAudio
@@ -31,7 +31,7 @@ public:
   virtual const int	getRetenc() const = 0;
   virtual void	setRetenc(int) = 0;
   virtual unsigned char* getData() const = 0;
-  virtual SoundPacket*	getStruct() const = 0;
+  virtual SoundPacket*	getStruct() = 0;
 };
 
 #endif /* __IAUDUI__ */

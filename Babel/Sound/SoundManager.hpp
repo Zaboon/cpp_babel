@@ -39,6 +39,6 @@ public:
 	virtual	unsigned char			*getReceivedData() const;
 	virtual	void					setReceivedRetenc(int);
 	virtual	int						getReceivedRetenc() const;
-	virtual SoundPacket*			getStruct() const;
+	virtual SoundPacket*			getStruct();
 
 };

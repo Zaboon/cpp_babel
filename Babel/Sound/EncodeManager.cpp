@@ -16,7 +16,7 @@ EncodeManager::~EncodeManager()
 
 unsigned char*	EncodeManager::encodeAudio(const float* frame, int* enc_ret)
 {
-  unsigned char* data = new (unsigned char[_len]);
+  unsigned char* data = new unsigned char[_len]();
 
   *enc_ret = opus_encode_float(_enc, frame, FRAMES_PER_BUFFER, data, _len);
   return data;
