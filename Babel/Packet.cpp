@@ -84,7 +84,8 @@ Packet::Packet(SoundPacket &p) : _type(Packet::Sound)
     for (unsigned int i = 0; i < sizeof(int); i++)
         this->_data.push_back(ptr[i]);
     for (unsigned int i = 0; i < FRAMES_PER_BUFFER; i++)
-        this->_data.push_back(ptr[i]);
+        this->_data.push_back(p.data[i]);
+    this->_encrypted = false;
 }
 
 //static

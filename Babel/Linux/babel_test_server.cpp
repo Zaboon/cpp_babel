@@ -34,8 +34,8 @@ void	onReceive(ISocket* client)
     {
       SoundPacket *sound = packet->unpack<SoundPacket>();
 
-      getSound()->setRetenc(sound->retenc);
-      getSound()->setData(sound->data);
+      getSound()->setReceivedRetenc(sound->retenc);
+      getSound()->setReceivedData(sound->data);
     }
 }
 
