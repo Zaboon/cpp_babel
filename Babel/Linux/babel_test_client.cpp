@@ -39,9 +39,18 @@ int     main(int ac, char **av)
 	getSound();
         server->start();
 
+        std::string plaque("CC-777-GG");
         while (42) {
-            (getSound()->getStruct());
-	  server->writePacket(Packet::pack<SoundPacket>(*(getSound()->getStruct())));
+            Packet *p = new Packet(*(getSound()->getStruct()));
+//            Packet *p = new Packet(plaque);
+//            std::cout << getSound()->getRetenc() << std::endl;
+//            std::cout << getSound()->getData() << std::endl;
+            getSound()->setReceivedRetenc(getSound()->getRetenc());
+            getSound()->setReceivedData(getSound()->getData());
+
+            usleep(10000);
+//            std::cout << p->getType() << std::endl;
+        	server->writePacket(p);
             }
 
         server->cancel();

@@ -248,14 +248,14 @@ SoundPacket       *SoundManager::getStruct()
 		sp = new SoundPacket;
 		sp->data = new unsigned char[480]();
 	}
-	std::cout << "OK" << std::endl;
+//	std::cout << "OK" << std::endl;
 	sp->retenc = this->getRetenc();
-	std::cout << "OK" << std::endl;
+//	std::cout << "OK" << std::endl;
 	for (int i = 0; i < FRAMES_PER_BUFFER; i++)
 	{
-		std::cout << i << std::endl;
+//		std::cout << i << std::endl;
 		sp->data[i] = _data[i];
 	}
-	std::cout << "OK" << std::endl;
+//	std::cout << "OK" << std::endl;
 	return sp;
 }
