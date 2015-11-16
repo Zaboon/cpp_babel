@@ -1,219 +1,252 @@
-#include	"SoundManager.hpp"
+#include "SoundManager.hpp"
 
-SoundManager::SoundManager()
-{
-  _opus = new EncodeManager;
-  _streamIn = NULL;
-  _streamOut = NULL;
-  for (int i = 0; i < FRAMES_PER_BUFFER; i++) _buff[i] = 0; /* memset */
-  _run = true;
+#ifdef _WIN32
+	#include <Windows.h>
+#endif
+
+SoundManager::SoundManager(){
+	this->_enc = new EncodeManager;
+	this->_streamin = NULL;
+	this->_streamout = NULL;
+	this->_run = true;
 }
 
-SoundManager::~SoundManager()
-{
-  if (_opus) delete _opus;
-  if (_data) delete _data;
-  if (_streamIn) Pa_CloseStream(_streamIn);
-  if (_streamOut) Pa_CloseStream(_streamOut);
-  Pa_Terminate();
+SoundManager::~SoundManager(){
+	if (this->_enc)
+		delete this->_enc;
+	if (this->_data)
+		delete this->_data;
+	if (this->_streamin)
+		Pa_CloseStream(this->_streamin);
+	if (this->_streamout)
+		Pa_CloseStream(this->_streamout);
+	Pa_Terminate();
 }
 
-int		SoundManager::initAudio()
+int			SoundManager::initAudio()
 {
-  _err = Pa_Initialize();
-  if (_err != paNoError)
-    {
-      this->errorAudio();
-      return 0;
-    }
-  initInput();
-  initOutput();
-  setupStream();
-  return 1;
+	this->_err = Pa_Initialize();
+	if (this->_err != paNoError)
+	{
+		this->errorAudio();
+		return (0);
+	}
+	this->initInput();
+	this->initOutput();
+	this->setupStream();
+	return (1);
 }
 
 void		SoundManager::errorAudio()
 {
-  if (_err != paNoError)
-    {
-      _run = false;
-      if (_streamIn)
-	Pa_CloseStream(_streamIn);
-      if (_streamOut)
-	Pa_CloseStream(_streamOut);
-      Pa_Terminate();
-      std::cerr << "An error occured while using the portaudio stream" << std::endl;
-      std::cerr << "Error number: " << _err << std::endl;
-      std::cerr << "Error message: " << Pa_GetErrorText(_err) << std::endl;
-    }
+	if (this->_err != paNoError)
+	{
+		this->_run = false;
+		if (this->_streamin)
+		{
+			Pa_AbortStream(this->_streamin);
+			Pa_CloseStream(this->_streamin);
+		}
+		if (this->_streamout)
+		{
+			Pa_AbortStream(this->_streamout);
+			Pa_CloseStream(this->_streamout);
+		}
+		Pa_Terminate();
+		std::cerr << "Error !" << std::endl;
+		std::cerr << "Error number : " << this->_err << std::endl;
+		std::cerr << "Error message : " << Pa_GetErrorText(this->_err) << std::endl;
+	}
 }
 
 void		SoundManager::initInput()
 {
-  _inParam.device = Pa_GetDefaultInputDevice();
-  _inParam.channelCount = 1;
-  _inParam.sampleFormat = PA_SAMPLE_TYPE;
-  _inParam.suggestedLatency = Pa_GetDeviceInfo(_inParam.device)->defaultLowInputLatency;
-  _inParam.hostApiSpecificStreamInfo = NULL;
+	this->_inputParam.device = Pa_GetDefaultInputDevice();
+	this->_inputParam.channelCount = 2;
+	this->_inputParam.sampleFormat = PA_SAMPLE_TYPE;
+	this->_inputParam.suggestedLatency = Pa_GetDeviceInfo(this->_inputParam.device)->defaultLowInputLatency;
+	this->_inputParam.hostApiSpecificStreamInfo = NULL;
 }
 
 void		SoundManager::initOutput()
 {
-  _outParam.device = Pa_GetDefaultOutputDevice();
-  _outParam.channelCount = 1;
-  _outParam.sampleFormat = PA_SAMPLE_TYPE;
-  _outParam.suggestedLatency = Pa_GetDeviceInfo(_outParam.device)->defaultLowOutputLatency;
-  _outParam.hostApiSpecificStreamInfo = NULL;
+	this->_outputParam.device = Pa_GetDefaultOutputDevice();
+	this->_outputParam.channelCount = 2;
+	this->_outputParam.sampleFormat = PA_SAMPLE_TYPE;
+	this->_outputParam.suggestedLatency = Pa_GetDeviceInfo(this->_outputParam.device)->defaultLowOutputLatency;
+	this->_outputParam.hostApiSpecificStreamInfo = NULL;
 }
 
-int recordCallback(const void *input, void *output,
-		  unsigned long framesPerBuffer,
-		  const PaStreamCallbackTimeInfo* timeInfo,
-		  PaStreamCallbackFlags statusFlags,
-		  void *userData)
+int			recordCallback(const void *input, void *output,
+							unsigned long framesPerBuffer,
+							const PaStreamCallbackTimeInfo* timeInfo,
+							PaStreamCallbackFlags statusFlags,
+							void *userData)
 {
-  SoundManager *dis = (SoundManager*)userData;
-  const SAMPLE *in = (const SAMPLE *)input;
-  int retenc(0);
-  (void)timeInfo;
-  (void)statusFlags;
-  (void)output;
+	SoundManager *dis = (SoundManager*)userData;
+	const SAMPLE *in = (const SAMPLE *)input;
+	int retenc(0);
+	(void)timeInfo;
+	(void)statusFlags;
+	(void)output;
 
 
-  dis->setData(dis->getEnc()->encodeAudio(in, &retenc));
-  dis->setRetenc(retenc);
-  return paContinue;
+	dis->setData(dis->getEnc()->encodeAudio(in, &retenc));
+	dis->setRetenc(retenc);
+	return paContinue;
 }
 
-int playCallback(const void *input, void *output,
-		unsigned long framesPerBuffer,
-		const PaStreamCallbackTimeInfo* timeInfo,
-		PaStreamCallbackFlags statusFlags,
-		void *userData)
+int			playCallback(const void *input, void *output,
+						unsigned long framesPerBuffer,
+						const PaStreamCallbackTimeInfo* timeInfo,
+						PaStreamCallbackFlags statusFlags,
+						void *userData)
 {
-  SoundManager *dis = (SoundManager*)userData;
-  SAMPLE*out = (SAMPLE *)output;
-  (void)timeInfo;
-  (void)statusFlags;
-  (void)input;
+	SoundManager *dis = (SoundManager*)userData;
+	SAMPLE	*out = (SAMPLE *)output;
+	(void)timeInfo;
+	(void)statusFlags;
+	(void)input;
 
-  dis->getEnc()->decodeAudio(dis->getData()->data, out, (dis->getData())->retenc);
-  return paContinue;
+	//dis->getEnc()->decodeAudio(dis->getData().first, out, dis->getData().second);
+	//dis->getEnc()->decodeAudio(dis->getData(), out, dis->getRetenc());
+	dis->getEnc()->decodeAudio(dis->getReceivedData(), out, dis->getReceivedRetenc());
+	return paContinue;
 }
 
-int                     SoundManager::setupStream()
+int			SoundManager::setupStream()
 {
-  this->_err = Pa_OpenStream(
-			     &this->_streamIn,
-			     &this->_inParam,
-			     NULL,
-			     SAMPLE_RATE,
-			     FRAMES_PER_BUFFER,
-			     paClipOff,
-			     recordCallback,
-			     this);
-  if (this->_err != paNoError)
-    {
-      this->errorAudio();
-      return (0);
-    }
-  this->_err = Pa_OpenStream(
-			     &this->_streamOut,
-			     NULL,
-			     &this->_outParam,
-			     SAMPLE_RATE,
-			     FRAMES_PER_BUFFER,
-			     paClipOff,
-			     playCallback,
-			     this);
-  if (this->_err != paNoError)
-    {
-      this->errorAudio();
-      return (0);
-    }
-  return (1);
-}
-
-int     SoundManager::startStream()
-{
-  this->_err = Pa_StartStream(this->_streamIn);
-  if (this->_err != paNoError)
-    {
-      this->errorAudio();
-      return (0);
-    }
-  this->_err = Pa_StartStream(this->_streamOut);
-  if (this->_err != paNoError)
-    {
-      this->errorAudio();
-      return (0);
-    }
-  std::cout << "Stream started..." << std::endl;
-  while (this->_run)
-    {
-      std::cout << "Hit ENTER to quit..." << std::endl;
-      if (std::cin.get() == '\n')
-	this->_run = false;
-    }
-  return (1);
-}
-
-
-int                     SoundManager::stopStream()
-{
-  if (this->_streamIn)
-    {
-      this->_err = Pa_StopStream(this->_streamIn);
-      if (this->_err != paNoError)
+	this->_err = Pa_OpenStream(
+		&this->_streamin,
+		&this->_inputParam,
+		NULL,
+		SAMPLE_RATE,
+		FRAMES_PER_BUFFER,
+		paClipOff,
+		recordCallback,
+		this);
+	if (this->_err != paNoError)
 	{
-	  this->errorAudio();
-	  return (0);
+		this->errorAudio();
+		return (0);
 	}
-    }
-  if (this->_streamOut)
-    {
-      this->_err = Pa_StopStream(this->_streamOut);
-      if (this->_err != paNoError)
+	this->_err = Pa_OpenStream(
+		&this->_streamout,
+		NULL,
+		&this->_outputParam,
+		SAMPLE_RATE,
+		FRAMES_PER_BUFFER,
+		paClipOff,
+		playCallback,
+		this);
+	if (this->_err != paNoError)
 	{
-	  this->errorAudio();
-	  return (0);
+		this->errorAudio();
+		return (0);
 	}
-    }
-  return (1);
+	return (1);
 }
 
-IEncode       *SoundManager::getEnc()
+int	SoundManager::startStream()
 {
-  return (this->_opus);
+	this->_err = Pa_StartStream(this->_streamin);
+	if (this->_err != paNoError)
+	{
+		this->errorAudio();
+		return (0);
+	}
+	this->_err = Pa_StartStream(this->_streamout);
+	if (this->_err != paNoError)
+	{
+		this->errorAudio();
+		return (0);
+	}
+	std::cout << "Stream started..." << std::endl;
+	/*while (this->_run)
+	{
+		std::cout << "Hit ENTER to quit..." << std::endl;
+		if (std::cin.get() == '\n')
+			this->_run = false;
+	}*/
+	return (1);
 }
 
-SoundPacket       *SoundManager::getData() const
+int			SoundManager::stopStream()
 {
-  static	SoundPacket* sp= NULL;
-
-  if (!sp)
-    sp = new SoundPacket;
-  sp->retenc = this->getRetenc();
-  std::memcpy(sp->data, _data, FRAMES_PER_BUFFER);
-  return sp;
+	if (this->_streamin)
+	{
+		this->_err = Pa_StopStream(this->_streamin);
+		if (this->_err != paNoError)
+		{
+			this->errorAudio();
+			return (0);
+		}
+	}
+	if (this->_streamout)
+	{
+		this->_err = Pa_StopStream(this->_streamout);
+		if (this->_err != paNoError)
+		{
+			this->errorAudio();
+			return (0);
+		}
+	}
+	return (1);
 }
 
-unsigned char*	SoundManager::getBuffer() const
+IEncode	*SoundManager::getEnc()
 {
-  return _data;
+	return (this->_enc);
 }
 
-void            SoundManager::setData(unsigned char *data)
+void		SoundManager::setData(unsigned char *data)
 {
-  this->_data = data;
+	this->_data = data;
 }
 
-int                       SoundManager::getRetenc() const
+const int			SoundManager::getRetenc() const
 {
-  return (this->_enc_ret);
-}
-void            SoundManager::setRetenc(int retenc)
-{
-  this->_enc_ret = retenc;
+	return (this->_retenc);
 }
 
+void		SoundManager::setRetenc(int retenc)
+{
+	this->_retenc = retenc;
+}
+
+unsigned char		*SoundManager::getData() const
+{
+	return (_data);
+}
+
+void				SoundManager::setReceivedData(unsigned char *data)
+{
+	this->_receivedData = data;
+}
+
+unsigned char		*SoundManager::getReceivedData() const
+{
+	return _receivedData;
+}
+
+void					SoundManager::setReceivedRetenc(int retenc)
+{
+	this->_receivedRetenc = retenc;
+}
+
+int						SoundManager::getReceivedRetenc() const
+{
+	return _receivedRetenc;
+}
+
+SoundPacket       *SoundManager::getStruct() const
+{
+	static	SoundPacket* sp= NULL;
+
+	if (!sp)
+		sp = new SoundPacket;
+	sp->retenc = this->getRetenc();
+	for (int i = 0; i < FRAMES_PER_BUFFER; i++)
+		sp->data[i] = _data[i];
+	return sp;
+}

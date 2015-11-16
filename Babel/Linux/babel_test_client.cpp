@@ -41,8 +41,8 @@ int     main(int ac, char **av)
 
         while (42) {
 
-	  server->writePacket(Packet::pack<SoundPacket>(*(getSound()->getData())));
-        }
+	  server->writePacket(Packet::pack<SoundPacket>(*(getSound()->getStruct())));
+            }
 
         server->cancel();
         sleep(1);

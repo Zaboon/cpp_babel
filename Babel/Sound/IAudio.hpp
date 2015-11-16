@@ -28,10 +28,10 @@ public:
   virtual int	stopStream() = 0;
   virtual IEncode*	getEnc() = 0;
   virtual void	setData(unsigned char *) = 0;
-  virtual unsigned char *getBuffer() const = 0;
-  virtual int	getRetenc() const = 0;
+  virtual const int	getRetenc() const = 0;
   virtual void	setRetenc(int) = 0;
-  virtual SoundPacket*	getData() const = 0;
+  virtual unsigned char* getData() const = 0;
+  virtual SoundPacket*	getStruct() const = 0;
 };
 
 #endif /* __IAUDUI__ */

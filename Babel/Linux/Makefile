@@ -31,7 +31,7 @@ NAME_S		=	server
 
 NAME_C		=	client
 
-LIBS		=	-L. -lpthread -lcrypto -lssl -g3 -L../Sound -lopus -lrt -lasound -ljack -lm -lportaudio
+LIBS		=	-L. -lpthread -lcrypto -lssl -g3 -L../Sound -lopus -lrt -lasound -ljack -lm -lportaudio -W -Wall -Wextra
 
 all	:	$(NAME_S) $(NAME_C)
 
