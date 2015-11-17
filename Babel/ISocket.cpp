@@ -148,9 +148,8 @@ ISocket::write(const std::vector<unsigned char> &data, unsigned int id)
     {
         mutex = (*MutexVault::getMutexVault())["write" + MutexVault::toString(this->_id)];
         mutex->lock(true);
-        if (this->_write_buffer.size() <= MAX_BUFFER_SIZE)
-            for (unsigned int i = 0; i < data.size(); i++)
-                this->_write_buffer.push_back(data[i]);
+        for (unsigned int i = 0; i < data.size(); i++)
+            this->_write_buffer.push_back(data[i]);
         mutex->unlock();
     }
     else

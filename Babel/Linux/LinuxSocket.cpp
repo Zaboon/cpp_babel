@@ -135,7 +135,7 @@ LinuxSocket::launchClient(unsigned int __attribute__((__unused__)) thread_id, Li
 
                 if ((send_val = send(client->_socket, &(client->_write_buffer[0]), client->_write_buffer.size(), 0)) == -1)
                     client->_status = ISocket::Canceled;
-                if (send_val > 0)
+                else if (send_val > 0)
                     client->_write_buffer.erase(client->_write_buffer.begin(), client->_write_buffer.begin() + send_val);
             }
             write->unlock();

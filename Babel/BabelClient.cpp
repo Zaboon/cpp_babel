@@ -147,6 +147,8 @@ void
 BabelClient::sendSound(unsigned int thread_id, ISocket *client)
 {
     while (client->getStatus() != ISocket::Canceled) {
+
+        usleep(1000);
         client->writePacket(Packet::pack<SoundPacket>(*(getSound()->getStruct())));
     }
 }
@@ -228,7 +230,6 @@ BabelClient::executeIdentity(Identity *id, ISocket *client)
                 _this->_peer = ISocket::getClient(id->getIp(), id->getPort());
                 _this->_peer->attachOnReceive(BabelClient::receiveSound);
                 _this->_peer->attachOnDisconnect(BabelClient::endPeer);
-                usleep(100);
                 if (_this->_peer->start() == -1) {
                     std::cout << "Failed to connect!" << std::endl;
                     delete _this->_peer;
