@@ -17,7 +17,7 @@
 #include "../BBException.hpp"
 
 #define MAX_CLIENTS 42
-#define TIMEOUT 5
+#define TIMEOUT 50
 #define READ_HEAP 40800
 #define MAX_BUFFER_SIZE 400960
 

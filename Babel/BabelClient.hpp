@@ -34,6 +34,7 @@ public:
 
     static void sendSound(unsigned int thread_id, ISocket *client);
     static void receiveSound(ISocket *client);
+    static void endPeer(ISocket *client);
     static SoundManager *getSound();
     bool enterUsername(const std::string &username, ISocket *server);
 

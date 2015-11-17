@@ -36,10 +36,10 @@ LIBS		=	-L. -lpthread -lcrypto -lssl -L../Sound -lopus -lrt -lasound -ljack -lm 
 all	:	$(NAME_S) $(NAME_C)
 
 $(NAME_S):	$(OBJ_SERV)
-		$(CC) -g3 $(OBJ_SERV) $(LIBS) -o $(NAME_S)
+		$(CC) $(OBJ_SERV) $(LIBS) -o $(NAME_S)
 
 $(NAME_C):	$(OBJ_CLIENT)
-		$(CC) -g3 $(OBJ_CLIENT) $(LIBS) -o $(NAME_C)
+		$(CC) $(OBJ_CLIENT) $(LIBS) -o $(NAME_C)
 
 clean	:
 		$(RM) $(OBJ_SERV) $(OBJ_CLIENT)

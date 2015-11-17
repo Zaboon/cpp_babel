@@ -224,7 +224,6 @@ BabelServer::executeIdentity(Identity *identity, ISocket *client)
                 client->writePacket(new Packet(OK));
                 server->sendPacketToAllRegisteredUsers(new Packet(id), client);
                 std::cout << "Welcome, " << identity->getUsername() << "!" << std::endl;
-                mutex->unlock();
             }
             else
                 client->writePacket(new Packet(KO));
@@ -241,8 +240,9 @@ BabelServer::executeIdentity(Identity *identity, ISocket *client)
                 peer_profile->second->setPeer(client_profile->second);
 
                 peer_profile->second->setInstruct(OK);
-                client_profile->first->writePacket(new Packet(*(peer_profile->second)));
                 client_profile->second->setInstruct(ASKCALL);
+
+                client_profile->first->writePacket(new Packet(*(peer_profile->second)));
                 peer_profile->first->writePacket(new Packet(*(client_profile->second)));
             }
             else

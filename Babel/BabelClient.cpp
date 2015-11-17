@@ -107,6 +107,25 @@ BabelClient::removeContact(Identity *id)
 }
 
 void
+BabelClient::endPeer(ISocket *client)
+{
+    IMutex *mutex = (*MutexVault::getMutexVault())["peer"];
+    BabelClient *_this = BabelClient::getInstance();
+
+    mutex->lock(true);
+    if (_this->_peer != NULL) {
+
+        BabelClient::getSound()->stopStream();
+        delete _this->_peerthread;
+        _this->_peer->cancel();
+        usleep(100);
+        delete _this->_peer;
+        _this->_peer = NULL;
+    }
+    mutex->unlock();
+}
+
+void
 BabelClient::receiveSound(ISocket *client)
 {
     Packet* packet;
@@ -114,9 +133,7 @@ BabelClient::receiveSound(ISocket *client)
 
     while ((packet = client->readPacket()) != NULL) {
 
-        if (packet->getType() == Packet::Sound) {
-
-            sound = packet->unpack<SoundPacket>();
+        if ((sound = packet->unpack<SoundPacket>()) != NULL) {
 
             BabelClient::getSound()->setReceivedRetenc(sound->retenc);
             BabelClient::getSound()->setReceivedData(sound->data);
@@ -130,7 +147,8 @@ void
 BabelClient::sendSound(unsigned int thread_id, ISocket *client)
 {
     while (client->getStatus() != ISocket::Canceled) {
-        client->writePacket(new Packet((*getSound()->getStruct())));
+        usleep(700);
+        client->writePacket(Packet::pack<SoundPacket>(*(getSound()->getStruct())));
     }
 }
 
@@ -169,6 +187,8 @@ BabelClient::answer(ISocket *client)
         if (_this->_peer->start() == -1) {
             std::cout << "Connection failed" << std::endl;
             client->writePacket(new Packet(ENDCALL));
+            _this->_peer->cancel();
+            usleep(100);
             delete _this->_peer;
             _this->_peer = NULL;
         }
@@ -208,6 +228,7 @@ BabelClient::executeIdentity(Identity *id, ISocket *client)
 
                 _this->_peer = ISocket::getClient(id->getIp(), id->getPort());
                 _this->_peer->attachOnReceive(BabelClient::receiveSound);
+                _this->_peer->attachOnDisconnect(BabelClient::endPeer);
                 _this->getSound();
                 _this->_peer->start();
                 _this->_peerthread = new LinuxThread<void, ISocket *>(BabelClient::sendSound);
@@ -261,6 +282,8 @@ BabelClient::onDisconnect(ISocket *client)
     mutex->lock(true);
     if (_this->_peer != NULL) {
         _this->_peer->cancel();
+        BabelClient::getSound()->stopStream();
+        usleep(100);
         delete _this->_peer;
         _this->_peer = NULL;
     }
@@ -295,6 +318,8 @@ BabelClient::waitingForAnswer(ISocket *client)
                 if (id->getInstruct() == OK) {
                     std::cout << "Creating server" << std::endl;
 
+                    IMutex *mutex = (*MutexVault::getMutexVault())["peer"];
+                    mutex->lock(true);
                     _this->_peer = ISocket::getServer(5555);
                     _this->_peer->attachOnReceive(BabelClient::receiveSound);
                     _this->getSound();
@@ -304,6 +329,7 @@ BabelClient::waitingForAnswer(ISocket *client)
                     (*_this->_peerthread)(_this->_peer);
 
                     client->attachOnReceive(BabelClient::onReceiveLogged);
+                    mutex->unlock();
                 }
                 delete id;
             }
