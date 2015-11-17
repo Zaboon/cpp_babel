@@ -233,6 +233,7 @@ BabelClient::executeIdentity(Identity *id, ISocket *client)
                     std::cout << "Failed to connect!" << std::endl;
                     delete _this->_peer;
                     _this->_peer = NULL;
+                    client->writePacket(new Packet(ENDCALL));
                 }
                 else {
                     _this->getSound();
