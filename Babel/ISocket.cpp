@@ -126,7 +126,7 @@ ISocket::readPacket()
 
     IMutex *mutex = (*MutexVault::getMutexVault())["read" + MutexVault::toString(this->_id)];
     mutex->lock(true);
-    if ((packetSize = Packet::extractSizeFromHeader(this->_read_buffer)) != -1 &&
+    if ((packetSize = Packet::extractSizeFromHeader(this->_read_buffer)) > 0 &&
         (totalSize = (packetSize + static_cast<int>(Packet::getHeaderSize()))) <= this->_read_buffer.size()) {
 
         for (unsigned int i = 0; i < totalSize; i++)

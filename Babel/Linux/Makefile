@@ -1,7 +1,7 @@
 CC	=	g++
 RM	=	rm -f
 
-SRC_SERV	=	babel_test_server.cpp	\
+SRC_SERV	=	babel_test_server_stash.cpp	\
 				LinuxSocket.cpp			\
 				../MutexVault.cpp		\
 				../ISocket.cpp			\
@@ -12,7 +12,7 @@ SRC_SERV	=	babel_test_server.cpp	\
 				../Sound/SoundManager.cpp	\
 				../Sound/EncodeManager.cpp
 
-SRC_CLIENT	=	babel_test_client.cpp	\
+SRC_CLIENT	=	babel_test_client_stash.cpp	\
 				LinuxSocket.cpp			\
 				../MutexVault.cpp		\
 				../ISocket.cpp			\
@@ -31,15 +31,15 @@ NAME_S		=	server
 
 NAME_C		=	client
 
-LIBS		=	-L. -lpthread -lcrypto -lssl -g3 -L../Sound -lopus -lrt -lasound -ljack -lm -lportaudio -W -Wall -Wextra
+LIBS		=	-L. -lpthread -lcrypto -lssl -L../Sound -lopus -lrt -lasound -ljack -lm -lportaudio -W -Wall -Wextra
 
 all	:	$(NAME_S) $(NAME_C)
 
 $(NAME_S):	$(OBJ_SERV)
-		$(CC) $(OBJ_SERV) $(LIBS) -o $(NAME_S)
+		$(CC) -g3 $(OBJ_SERV) $(LIBS) -o $(NAME_S)
 
 $(NAME_C):	$(OBJ_CLIENT)
-		$(CC) $(OBJ_CLIENT) $(LIBS) -o $(NAME_C)
+		$(CC) -g3 $(OBJ_CLIENT) $(LIBS) -o $(NAME_C)
 
 clean	:
 		$(RM) $(OBJ_SERV) $(OBJ_CLIENT)

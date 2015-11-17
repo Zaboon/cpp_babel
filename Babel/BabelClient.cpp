@@ -2,6 +2,7 @@
 // Created by rustam_t on 11/11/15.
 //
 
+#include "Linux/LinuxSocket.h"
 #include "BabelClient.hpp"
 #include <unistd.h>
 
@@ -37,6 +38,46 @@ BabelClient::setConnected(bool status)
     this->connected = status;
 }
 
+bool
+BabelClient::isConnected() const
+{
+    return (this->connected);
+}
+
+SoundManager *
+BabelClient::getSound()
+{
+    static SoundManager *sound = NULL;
+
+    if (sound == NULL)
+    {
+        sound = new SoundManager;
+
+        Pa_Initialize();
+        sound->initAudio();
+        sound->startStream();
+    }
+
+    return sound;
+}
+
+
+bool
+BabelClient::enterUsername(const std::string &username, ISocket *server)
+{
+    Identity *id;
+
+    if (!this->connected) {
+
+        id = new Identity(username, LinuxSocket::getMachineIp(), 5555, CONNECTION);
+        server->writePacket(Packet::pack<Identity>(*id));
+        server->attachOnReceive(BabelClient::waitingForUsernameValidation);
+        delete id;
+        return (true);
+    }
+    return (false);
+}
+
 void
 BabelClient::addContact(Identity *id)
 {
@@ -63,6 +104,56 @@ BabelClient::removeContact(Identity *id)
             break;
         }
     mutex->unlock();
+}
+
+void
+BabelClient::receiveSound(ISocket *client)
+{
+    Packet* packet;
+    SoundPacket *sound;
+
+    while ((packet = client->readPacket()) != NULL) {
+
+        if (packet->getType() == Packet::Sound) {
+
+            sound = packet->unpack<SoundPacket>();
+
+            BabelClient::getSound()->setReceivedRetenc(sound->retenc);
+            BabelClient::getSound()->setReceivedData(sound->data);
+            delete sound;
+        }
+        delete packet;
+    }
+}
+
+void
+BabelClient::sendSound(unsigned int thread_id, ISocket *client)
+{
+    while (client->getStatus() != ISocket::Canceled) {
+        client->writePacket(new Packet((*getSound()->getStruct())));
+    }
+}
+
+bool
+BabelClient::call(const std::string &peername, ISocket *server)
+{
+    bool ret = false;
+    Identity *id;
+    IMutex *mutex = (*MutexVault::getMutexVault())["peer"];
+
+    mutex->lock(true);
+    if (this->_peer == NULL)
+    {
+        id = new Identity(peername, ASKCALL);
+        server->writePacket(Packet::pack<Identity>(*id));
+        server->attachOnReceive(BabelClient::waitingForAnswer);
+        delete id;
+        ret = true;
+    }
+    else
+        std::cout << "You cannot call 2 persons at the same time!" << std::endl;
+    mutex->unlock();
+    return (ret);
 }
 
 bool
@@ -112,8 +203,16 @@ BabelClient::executeIdentity(Identity *id, ISocket *client)
         case (ASKCALL) :
             mutex = (*MutexVault::getMutexVault())["peer"];
             mutex->lock(true);
-            if (id->hasAdressAndName() && _this->_peer == NULL)
+            std::cout << "asked to call " << id->getIp() << std::endl;
+            if (id->hasAdressAndName() && _this->_peer == NULL) {
+
                 _this->_peer = ISocket::getClient(id->getIp(), id->getPort());
+                _this->_peer->attachOnReceive(BabelClient::receiveSound);
+                _this->getSound();
+                _this->_peer->start();
+                _this->_peerthread = new LinuxThread<void, ISocket *>(BabelClient::sendSound);
+                (*_this->_peerthread)(_this->_peer);
+            }
             mutex->unlock();
     }
     delete id;
@@ -137,6 +236,8 @@ BabelClient::executeInstruction(Instruct *instruct, ISocket *client)
             {
                 _this->_peer->cancel();
                 delete _this->_peer;
+                delete _this->_peerthread;
+                _this->getSound()->stopStream();
                 _this->_peer = NULL;
             }
             mutex->unlock();
@@ -168,6 +269,74 @@ BabelClient::onDisconnect(ISocket *client)
 }
 
 void
+BabelClient::waitingForAnswer(ISocket *client)
+{
+    Packet *packet;
+    Instruct *instruct;
+    Identity *id;
+    BabelClient *_this = BabelClient::getInstance();
+
+    std::cout << "Waiting for answer" << std::endl;
+    if ((packet = client->readPacket()) != NULL) {
+
+        if (packet->getType() == Packet::Inst &&
+            (instruct = packet->unpack<Instruct>()) != NULL) {
+
+            if (*instruct == KO) {
+                std::cout << "No such user or whatever" << std::endl;
+                client->attachOnReceive(BabelClient::onReceiveLogged);
+            }
+            delete instruct;
+        }
+        else if (packet->getType() == Packet::Id)
+        {
+            if ((id = packet->unpack<Identity>()) != NULL) {
+
+                if (id->getInstruct() == OK) {
+                    std::cout << "Creating server" << std::endl;
+
+                    _this->_peer = ISocket::getServer(5555);
+                    _this->_peer->attachOnReceive(BabelClient::receiveSound);
+                    _this->getSound();
+                    _this->_peer->start();
+
+                    _this->_peerthread = new LinuxThread<void, ISocket *>(BabelClient::sendSound);
+                    (*_this->_peerthread)(_this->_peer);
+
+                    client->attachOnReceive(BabelClient::onReceiveLogged);
+                }
+                delete id;
+            }
+        }
+        delete packet;
+    }
+}
+
+void
+BabelClient::onReceiveLogged(ISocket *client) {
+
+    Packet *packet;
+
+    //get packet
+    if ((packet = client->readPacket()) != NULL) {
+
+        if (packet->getType() == Packet::Id)
+            BabelClient::executeIdentity(packet->unpack<Identity>(), client);
+        else if (packet->getType() == Packet::Inst)
+            BabelClient::executeInstruction(packet->unpack<Instruct>(), client);
+        else if (packet->getType() == Packet::String) {
+
+            std::string *msg = packet->unpack<std::string>();
+            std::cout << "Received message from " << client->getIp() << " (msg_length : " << msg->size() << ") : ";
+            std::cout << *msg << std::endl;
+            delete msg;
+        }
+
+        delete packet;
+    }
+}
+
+void
 BabelClient::waitingForUsernameValidation(ISocket *client)
 {
     Packet *packet;
@@ -181,29 +350,18 @@ BabelClient::waitingForUsernameValidation(ISocket *client)
             if (*instruct == OK) {
                 std::cout << "Successfully logged in!" << std::endl;
                 BabelClient::getInstance()->setConnected(true);
-                client->attachOnReceive(BabelClient::onReceive);
+                client->attachOnReceive(BabelClient::onReceiveLogged);
             }
-            else {
-                std::cout << "Failed to log in!" << std::endl;
-                std::cout << "Try username caca" << std::endl;
-                Identity i("caca", "127.0.0.1", 4242, CONNECTION);
-                client->writePacket(new Packet(i));
-            }
+            else
+                std::cout << "Username invalid or already taken" << std::endl;
             delete instruct;
         }
         delete packet;
-        return;
     }
 }
 
 void
-BabelClient::inputUsername(ISocket *client)
-{
-    client->attachOnReceive(BabelClient::waitingForUsernameValidation);
-}
-
-void
-BabelClient::onReceive(ISocket *client)
+BabelClient::onReceiveNotLogged(ISocket *client)
 {
     Packet  *packet;
 
@@ -221,30 +379,11 @@ BabelClient::onReceive(ISocket *client)
                     client->attachRsa(packet->unpack<Rsa>());
 
                 std::cout << "Ok for public key for " << client->getIp() << std::endl;
-
-                std::cout << "Try username pipi" << std::endl;
-                Identity i("pipi", "127.0.0.1", 4242, CONNECTION);
-                client->writePacket(new Packet(i));
-                //redirect for response
+                std::cout << "Enter your username : " << std::endl;
+                //wait for username answer
                 client->attachOnReceive(BabelClient::waitingForUsernameValidation);
             }
         }
-        else if (packet->getType() == Packet::String) {
-
-            std::string *msg = packet->unpack<std::string>();
-            std::cout << "Received message from " << client->getIp() << " (msg_length : " << msg->size() << ") : ";
-            std::cout << *msg << std::endl;
-            delete msg;
-        }
-        else ;{
-
-            if (packet->getType() == Packet::Id)
-                BabelClient::executeIdentity(packet->unpack<Identity>(), client);
-            else if (packet->getType() == Packet::Inst)
-                BabelClient::executeInstruction(packet->unpack<Instruct>(), client);
-        }
-
-
         delete packet;
     }
 }

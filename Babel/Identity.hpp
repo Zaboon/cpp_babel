@@ -26,6 +26,11 @@ class Identity
 {
 public:
 
+    Identity()
+    {
+        this->_peer = NULL;
+    };
+
     Identity(std::string const& name, Instruct const instruction)
     {
         memset(_username, 0, sizeof(_username));
@@ -34,6 +39,7 @@ public:
             _username[i] = name[i];
         _port = 0;
         _instruction = instruction;
+        this->_peer = NULL;
     }
 
     Identity(std::string const& name, std::string const& ip, unsigned int const port, Instruct const instruction)
@@ -46,6 +52,7 @@ public:
             _ip[i] = ip[i];
         _port = port;
         _instruction = instruction;
+        this->_peer = NULL;
     }
 
     Instruct    getInstruct() const
@@ -152,11 +159,13 @@ public:
         return (peer);
     }
 
-private:
     Instruct        _instruction;
     unsigned int    _port;
     char            _username[64];
     char            _ip[32];
+
+private:
+
     Identity        *_peer;
 };
 

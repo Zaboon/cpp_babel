@@ -10,6 +10,8 @@
 #include "Packet.h"
 #include "Rsa.h"
 #include "Identity.hpp"
+#include "Sound/SoundManager.hpp"
+#include "IThread.hpp"
 #include <vector>
 
 class BabelClient {
@@ -30,12 +32,19 @@ public:
 
     std::vector<Identity> getContacts();
 
+    static void sendSound(unsigned int thread_id, ISocket *client);
+    static void receiveSound(ISocket *client);
+    static SoundManager *getSound();
+    bool enterUsername(const std::string &username, ISocket *server);
+
     void addContact(Identity *id);
     void removeContact(Identity *id);
 
     void setConnected(bool status);
+    bool isConnected() const;
 
     static bool answer(ISocket *client);
+    bool call(const std::string &peername, ISocket *server);
 
     static void executeIdentity(Identity *, ISocket *client);
 
@@ -43,9 +52,10 @@ public:
 
     static void onConnect(ISocket *client);
 
-    static void onReceive(ISocket *client);
+    static void onReceiveNotLogged(ISocket *client);
     static void waitingForUsernameValidation(ISocket *client);
-    static void inputUsername(ISocket *client);
+    static void onReceiveLogged(ISocket *client);
+    static void waitingForAnswer(ISocket *client);
 
     static void onDisconnect(ISocket *client);
 
@@ -55,9 +65,9 @@ private:
 
     bool connected;
     bool asked_call;
-    Instruct *latest_cmd;
     std::vector<Identity *> _contacts;
     ISocket *_peer;
+    IThread<void, ISocket*> *_peerthread;
 };
 
 

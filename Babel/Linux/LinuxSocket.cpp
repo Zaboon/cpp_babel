@@ -108,8 +108,7 @@ LinuxSocket::launchClient(unsigned int __attribute__((__unused__)) thread_id, Li
         {
             //begin protected action
             if (client->_read_buffer.size() > MAX_BUFFER_SIZE)
-                client->_read_buffer.empty();
-            client->_read_buffer.clear();
+                client->_read_buffer.clear();
             if ((read_val = recv(client->_socket, &buffer[0], READ_HEAP, 0)) == -1)
                 client->_status = ISocket::Canceled;
             else if (read_val == 0)
