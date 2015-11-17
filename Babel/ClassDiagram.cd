@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BBException" Collapsed="true">
+    <Position X="10.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAACAAAAAAAAAAAAAAAAAAAAAEAAAAAAEAAA=</HashCode>
+      <FileName>BBException.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Contact" Collapsed="true">
+    <Position X="12" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAQAAAAAAAAAA=</HashCode>
+      <FileName>Contact.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IMutex" Collapsed="true">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAIAAEAAAAAAAAAAAAAAAAAAABEACAAAAAABAAAA=</HashCode>
+      <FileName>IMutex.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ISocket" Collapsed="true">
+    <Position X="6.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AkBAEAAFAEAAoUwgACDEAggAAQyAdEAIQRogQIAAAgA=</HashCode>
+      <FileName>ISocket.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IThread&lt;T, U&gt;" Collapsed="true">
+    <Position X="1.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AkAAAIAQEAAAAAAAEADAAAQAAAIgBEAAABAAAQAAEAA=</HashCode>
+      <FileName>IThread.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MutexVault" Collapsed="true">
+    <Position X="10.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gACAAAACAAAAAAAEAAGIBAAAAAEAIAAAAAAAAAAABAA=</HashCode>
+      <FileName>MutexVault.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WinCriticalSession" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAogAEAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Windows\WinCriticalSession.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WinMutex" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAEAAAAAAAAAACAAAAACAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Windows\WinMutex.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WinSocket" Collapsed="true">
+    <Position X="5.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gIBAAAAAAEABABAgAAABAAAAAAEAAQAAAAAARAAAAAA=</HashCode>
+      <FileName>Windows\WinSocket.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WinThread&lt;T, U&gt;" Collapsed="true">
+    <Position X="2.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAABAAAAiAAAACAAAAAAAABA=</HashCode>
+      <FileName>Windows\WinThread.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LinuxMutex" Collapsed="true">
+    <Position X="3" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAgEAAAAAQAAIACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Linux\LinuxMutex.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LinuxSocket" Collapsed="true">
+    <Position X="7.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gIBAAAAAAAAAAAAgAAABACAAAAEAAAAAAAAARAAAAAA=</HashCode>
+      <FileName>Linux\LinuxSocket.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LinuxThread&lt;T, U&gt;" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEgABAAAAAAAgAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Linux\LinuxThread.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
