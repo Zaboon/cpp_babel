@@ -228,10 +228,18 @@ BabelClient::executeIdentity(Identity *id, ISocket *client)
                 _this->_peer = ISocket::getClient(id->getIp(), id->getPort());
                 _this->_peer->attachOnReceive(BabelClient::receiveSound);
                 _this->_peer->attachOnDisconnect(BabelClient::endPeer);
-                _this->getSound();
-                _this->_peer->start();
-                _this->_peerthread = new LinuxThread<void, ISocket *>(BabelClient::sendSound);
-                (*_this->_peerthread)(_this->_peer);
+                usleep(100);
+                if (_this->_peer->start() == -1) {
+                    std::cout << "Failed to connect!" << std::endl;
+                    delete _this->_peer;
+                    _this->_peer = NULL;
+                }
+                else {
+                    _this->getSound();
+
+                    _this->_peerthread = new LinuxThread<void, ISocket *>(BabelClient::sendSound);
+                    (*_this->_peerthread)(_this->_peer);
+                }
             }
             mutex->unlock();
     }
