@@ -5,6 +5,16 @@
 #ifndef CPP_BABEL_RSA_H
 #define CPP_BABEL_RSA_H
 
+#if defined(_WIN32) && !defined(WIN32)
+# define _WINSOCKAPI_
+# include <windows.h>
+# define WIN32
+#endif
+
+#ifdef _WIN32
+# include <WinSock2.h>
+#endif
+
 #include <openssl/pem.h>
 #include <openssl/ssl.h>
 #include <openssl/rsa.h>

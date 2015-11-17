@@ -7,6 +7,7 @@
 # include				<processthreadsapi.h>
 # include				"../IThread.hpp"
 # include				"WinMutex.hpp"
+# include				"WinCriticalSession.hpp"
 
 template<typename T, typename U>
 class WinThread :		public IThread<T, U>
@@ -16,7 +17,7 @@ private:
 	DWORD				_thread_id;
 
 public:
-	WinThread(T(*func_ptr)(unsigned int, U)) : IThread<T, U>(func_ptr)
+	WinThread(T (*func_ptr)(unsigned int, U)) : IThread<T, U>(func_ptr)
 	{
 		IThread<T, U>::_mutex_vault->push_back(new WinCriticalSession());
 	}
@@ -35,7 +36,7 @@ public:
 			this->getStatus() == IThread<T, U>::Ready)
 			return (false);
 
-		this->setStatus(IThread < IThread<T, U> U::Stopped);
+		this->setStatus(IThread<T, U>::Stopped);
 		// I'm sorry Dave, I'm afraid I can't do that (terminating threads on windows)
 		return (1);
 	}

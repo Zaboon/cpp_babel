@@ -5,6 +5,12 @@
 #ifndef CPP_BABEL_PACKET_H
 #define CPP_BABEL_PACKET_H
 
+#if defined(_WIN32) && !defined(WIN32)
+# define _WINSOCKAPI_
+# include <windows.h>
+# define WIN32
+#endif
+
 #include <string>
 #include <vector>
 #include <typeinfo>

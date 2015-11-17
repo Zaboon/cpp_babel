@@ -4,13 +4,16 @@
 # pragma comment(lib, "Ws2_32.lib")
 # define _WINSOCK_DEPRECATED_NO_WARNINGS
 
+# ifndef _WIN_32
+#  define _WIN_32
+# endif
+# include							"../ISocket.h"
 # include							<socketapi.h>
 # include							<WinSock2.h>
 # include							<WS2tcpip.h>
 # include							<MSWSock.h>
 # include							"WinThread.hpp"
 # include							"../BBException.hpp"
-# include							"../ISocket.h"
 
 # define MAX_CLIENTS				42
 # define MAX_BUFFER_SIZE			40960
@@ -24,19 +27,19 @@ private:
 	SOCKET							_socket;
 	struct addrinfo					*_addrinfo;
 	bool							_socketOpened;
-	WinThread<void, WinSocket *>    *_thread;
+	WinThread<void, WinSocket *>	*_thread;
 
 protected:
-	void							acceptNewClients(unsigned int  thread_id, WinSocket *server);
-	void							launchClient(unsigned int thread_id, WinSocket *client);
-	WinSocket(ISocket::Type type) : ISocket(type);
+	static void						acceptNewClients(unsigned int  thread_id, WinSocket *server);
+	static void						launchClient(unsigned int thread_id, WinSocket *client);
+	WinSocket(ISocket::Type type);
 	void							launchWSA();
 
 public:
-	const std::string				&getMachineIp();
+	static const std::string		&getMachineIp();
 
-	WinSocket(int port, const std::string &proto) : ISocket(ISocket::Server, WinSocket::getMachineIp(), port);
-	WinSocket(const std::string &ip, int port, const std::string &proto) : ISocket(ISocket::Client, ip, port);
+	WinSocket(int port, const std::string &proto);
+	WinSocket(const std::string &ip, int port, const std::string &proto);
 
 	void							cancel();
 	int								start();

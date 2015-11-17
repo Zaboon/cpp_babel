@@ -33,9 +33,6 @@
     <ClInclude Include="BBException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IThread.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Windows\WinCriticalSession.hpp">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
@@ -60,6 +57,24 @@
     <ClInclude Include="Windows\WinSocket.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="BabelClient.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BabelServer.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Identity.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rsa.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IThread.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -80,8 +95,21 @@
     <ClCompile Include="Windows\WinSocket.cpp">
       <Filter>Header Files\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="BabelClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BabelServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rsa.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

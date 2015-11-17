@@ -2,9 +2,14 @@
 // Created by rustam_t on 11/11/15.
 //
 
-#include "Linux/LinuxSocket.h"
 #include "BabelClient.hpp"
+
+#ifdef WIN32
+#include "Windows\WinSocket.h"
+#else
+#include "Linux/LinuxSocket.h"
 #include <unistd.h>
+#endif
 
 BabelClient *
 BabelClient::getInstance()
@@ -69,7 +74,11 @@ BabelClient::enterUsername(const std::string &username, ISocket *server)
 
     if (!this->connected) {
 
-        id = new Identity(username, LinuxSocket::getMachineIp(), 5555, CONNECTION);
+		#ifdef _WIN_32
+			id = new Identity(username, WinSocket::getMachineIp(), 5555, CONNECTION);
+		#else
+			id = new Identity(username, LinuxSocket::getMachineIp(), 5555, CONNECTION);
+		#endif
         server->writePacket(Packet::pack<Identity>(*id));
         server->attachOnReceive(BabelClient::waitingForUsernameValidation);
         delete id;
@@ -118,7 +127,11 @@ BabelClient::endPeer(ISocket *client)
         BabelClient::getSound()->stopStream();
         delete _this->_peerthread;
         _this->_peer->cancel();
-        usleep(100);
+		#ifdef _WIN_32
+			Sleep(100);
+		#else
+			usleep(100);
+		#endif
         delete _this->_peer;
         _this->_peer = NULL;
     }
@@ -146,9 +159,13 @@ BabelClient::receiveSound(ISocket *client)
 void
 BabelClient::sendSound(unsigned int thread_id, ISocket *client)
 {
-    while (client->getStatus() != ISocket::Canceled) {
-
-        usleep(1000);
+    while (client->getStatus() != ISocket::Canceled)
+	{
+		#ifdef _WIN_32
+			Sleep(100);
+		#else
+			usleep(100);
+		#endif
         client->writePacket(Packet::pack<SoundPacket>(*(getSound()->getStruct())));
     }
 }
@@ -189,7 +206,11 @@ BabelClient::answer(ISocket *client)
             std::cout << "Connection failed" << std::endl;
             client->writePacket(new Packet(ENDCALL));
             _this->_peer->cancel();
-            usleep(100);
+			#ifdef _WIN_32
+				Sleep(100);
+			#else
+				usleep(100);
+			#endif
             delete _this->_peer;
             _this->_peer = NULL;
         }
@@ -239,7 +260,11 @@ BabelClient::executeIdentity(Identity *id, ISocket *client)
                 else {
                     _this->getSound();
 
-                    _this->_peerthread = new LinuxThread<void, ISocket *>(BabelClient::sendSound);
+					#ifdef _WIN_32
+						_this->_peerthread = new WinThread<void, ISocket *>(BabelClient::sendSound);
+					#else
+						_this->_peerthread = new LinuxThread<void, ISocket *>(BabelClient::sendSound);
+					#endif
                     (*_this->_peerthread)(_this->_peer);
                 }
             }
@@ -292,7 +317,11 @@ BabelClient::onDisconnect(ISocket *client)
     if (_this->_peer != NULL) {
         _this->_peer->cancel();
         BabelClient::getSound()->stopStream();
-        usleep(100);
+		#ifdef _WIN_32
+			Sleep(100);
+		#else
+			usleep(100);
+		#endif
         delete _this->_peer;
         _this->_peer = NULL;
     }
@@ -334,7 +363,11 @@ BabelClient::waitingForAnswer(ISocket *client)
                     _this->getSound();
                     _this->_peer->start();
 
-                    _this->_peerthread = new LinuxThread<void, ISocket *>(BabelClient::sendSound);
+					#ifdef _WIN_32
+						_this->_peerthread = new WinThread<void, ISocket *>(BabelClient::sendSound);
+					#else
+						_this->_peerthread = new LinuxThread<void, ISocket *>(BabelClient::sendSound);
+					#endif
                     (*_this->_peerthread)(_this->_peer);
 
                     client->attachOnReceive(BabelClient::onReceiveLogged);
@@ -422,4 +455,3 @@ BabelClient::onReceiveNotLogged(ISocket *client)
         delete packet;
     }
 }
-

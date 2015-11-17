@@ -2,10 +2,11 @@
 
 const std::string					&WinSocket::getMachineIp()
 {
+	WSADATA							_wsaData;
 	static std::string				ip = "";
 
 	if (ip.size() == 0) {
-		if (WSAStartup(MAKEWORD(2, 2), &this->_wsaData) == 0)
+		if (WSAStartup(MAKEWORD(2, 2), &_wsaData) == 0)
 			throw BBException("WSAStartup failed");
 		char szHostName[255];
 		gethostname(szHostName, 255);

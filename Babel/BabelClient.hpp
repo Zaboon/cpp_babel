@@ -5,6 +5,12 @@
 #ifndef CPP_BABEL_BABELCLIENT_HPP
 #define CPP_BABEL_BABELCLIENT_HPP
 
+#if defined(_WIN32) && !defined(WIN32)
+# define _WINSOCKAPI_
+# include <windows.h>
+# define WIN32
+#endif
+
 #include "ISocket.h"
 #include "MutexVault.hpp"
 #include "Packet.h"
