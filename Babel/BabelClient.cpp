@@ -147,7 +147,6 @@ void
 BabelClient::sendSound(unsigned int thread_id, ISocket *client)
 {
     while (client->getStatus() != ISocket::Canceled) {
-        usleep(700);
         client->writePacket(Packet::pack<SoundPacket>(*(getSound()->getStruct())));
     }
 }

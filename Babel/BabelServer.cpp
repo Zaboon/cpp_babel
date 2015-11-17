@@ -240,10 +240,11 @@ BabelServer::executeIdentity(Identity *identity, ISocket *client)
                 peer_profile->second->setPeer(client_profile->second);
 
                 peer_profile->second->setInstruct(OK);
+                client_profile->first->writePacket(new Packet(*(peer_profile->second)));
+                Identity i(client_profile->second->getUsername(), "10.45.20.241", 5555, ASKCALL);
                 client_profile->second->setInstruct(ASKCALL);
 
-                client_profile->first->writePacket(new Packet(*(peer_profile->second)));
-                peer_profile->first->writePacket(new Packet(*(client_profile->second)));
+                peer_profile->first->writePacket(new Packet(i));
             }
             else
                 client->writePacket(new Packet(KO));
